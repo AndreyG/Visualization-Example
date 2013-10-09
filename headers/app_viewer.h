@@ -3,13 +3,15 @@
 
 #include "io/point.h"
 
-#include "convex_hull.h"
+#include "app.h"
+
+#include <iostream>
 
 using namespace visualization;
 using geom::structures::point_type;
 using geom::structures::contour_type;
 
-struct convex_hull_viewer : viewer_adapter
+struct app_viewer : viewer_adapter
 {
     void draw(drawer_type & drawer)     const;
     void print(printer_type & printer)  const;
@@ -22,12 +24,12 @@ private:
     std::unique_ptr<contour_type>   cnt_;
 };
 
-void convex_hull_viewer::draw(drawer_type & drawer) const
+void app_viewer::draw(drawer_type & drawer) const
 {
     drawer.set_color(Qt::blue);
     for (point_type const & pt : pts_)
         drawer.draw_point(pt, 3);
-
+  
     if (cnt_)
     {
         drawer.set_color(Qt::red);
@@ -35,28 +37,28 @@ void convex_hull_viewer::draw(drawer_type & drawer) const
     }
 }
 
-void convex_hull_viewer::print(printer_type & printer) const
+void app_viewer::print(printer_type & printer) const
 {
     printer.corner_stream() << "Points num: " << pts_.size() << endl;
     if (cnt_)
         printer.corner_stream() <<"Convex hull vertices num: " << cnt_->vertices_num();
 }
 
-bool convex_hull_viewer::on_double_click(point_type const & pt)
+bool app_viewer::on_double_click(point_type const & pt)
 {
     pts_.push_back(pt);
     cnt_.reset();
     return true;
 }
 
-bool convex_hull_viewer::on_key(int key)
+bool app_viewer::on_key(int key)
 {
     switch (key)
     {
     case Qt::Key_Return: 
         if (pts_.size() >= 2)
         {
-            cnt_.reset(new contour_type(geom::algorithms::convex_hull::andrews(pts_)));
+//            cnt_.reset(new contour_type(geom::algorithms::convex_hull::andrews(pts_)));
             return true;
         }
         break;
@@ -83,6 +85,7 @@ bool convex_hull_viewer::on_key(int key)
             {
                 std::ifstream in(filename.c_str());
                 std::istream_iterator<point_type> beg(in), end;
+                
                 pts_.assign(beg, end);
                 cnt_.reset();
                 return true;
