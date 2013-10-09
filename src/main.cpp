@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
-#include "viewer.h"
+#include "app_viewer.h"
 
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-    convex_hull_viewer viewer;
-    visualization::run_viewer(&viewer, "Convex Hull");
+    app_viewer viewer;
+    visualization::run_viewer(&viewer, "A point in a polygon");
 }

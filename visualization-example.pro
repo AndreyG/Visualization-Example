@@ -14,7 +14,6 @@ macx {
 }
 
 CONFIG += precompile_header
-PRECOMPILED_HEADER = stdafx.h
 
 DEPENDPATH += src \
               visualization/headers \
@@ -24,12 +23,13 @@ DEPENDPATH += src \
 
 INCLUDEPATH += src \
                visualization/headers \
+               headers \
 
-HEADERS += src/stdafx.h \
-           src/viewer.h \
-           src/convex_hull.h \
+HEADERS += headers/stdafx.h \
+           headers/app.h \
+           headers/app_viewer.h \
 
 SOURCES += src/main.cpp \
-           src/convex_hull.cpp \ 
+           src/app.cpp \ 
 
 LIBS += -Lvisualization -lvisualization
