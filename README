@@ -1,7 +1,7 @@
 Simple visualizer of the convex hull algorithm.
 
 Make project: 
-    git submodule update &&
+    git submodule update --init &&
     cd visualization &&
     qmake && make
     cd ..
