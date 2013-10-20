@@ -12,27 +12,42 @@ void app_viewer::draw(drawer_type & drawer) const {
     }
 }
 
+point_type app_viewer::get_info_pnt() const {
+    return point_type(
+            -get_wnd()->width() / 2 + 10,
+            -get_wnd()->height() / 2 + 10
+            );
+}
+
+point_type app_viewer::get_error_pnt() const {
+    return point_type(
+            -get_wnd()->width() / 2 + 10,
+            -get_wnd()->height() / 2 + 30
+            );
+}
+
 void app_viewer::print(printer_type & printer) const {
     printer.corner_stream() << "Points num: " << pts_.size() << endl;
-    point_type bottom_left_pnt(-get_wnd()->width() / 2 + 10, 
-                               -get_wnd()->height() / 2 + 10);
-    stream_type& bottom_left_corner_stream = printer.global_stream(bottom_left_pnt);
-    if (cnt_)
-        printer.corner_stream() << "Convex hull vertices num: " << cnt_->vertices_num();
+    stream_type& global_stream = printer.global_stream(get_error_pnt());
+    if(error_str != "")
+        global_stream << "ERROR: " << error_str;
+    
+    stream_type& global_stream2 = printer.global_stream(get_info_pnt());
+    
     if (is_polygon_draw_state) {
-        bottom_left_corner_stream << "Press space button to STOP polygon drawing (last face will be added automatically)";
+        global_stream2 << endl << "Press SPACE button to STOP polygon drawing (last face will be added automatically)";
     } else {
-        bottom_left_corner_stream << "Press space button to START polygon drawing";
+        global_stream2 << endl << "Press SPACE button to START polygon drawing (remove previous).";
     }
+
+    
 }
 
 bool app_viewer::on_double_click(point_type const & pt) {
-    //    if(is_polygon_draw_state) { 
-    //        on_polygon_drawing_click(pt);
-    //        return true;
-    //    }
-    pts_.push_back(pt);
-    cnt_.reset();
+    if (is_polygon_draw_state) {
+        return on_polygon_drawing_click(pt);
+    }
+
     return true;
 }
 
@@ -80,13 +95,29 @@ bool app_viewer::on_key(int key) {
 }
 
 bool app_viewer::on_polygon_drawing_click(point_type const & pt) {
-
+    pts_.push_back(pt);
+    cnt_.reset();
+    return true;
 }
 
 bool app_viewer::on_polygon_drawing_start() {
-
+    error_str = "";
+    return true;
 }
 
 bool app_viewer::on_polygon_drawing_stop() {
+    // check correctness
+    error_str = "";
+    if (pts_.size() < 3) {
+        error_str = "Less than 3 point.";
+    }
+    if (error_str.size() != 0) {
+        error_str = error_str + " Polygon is deleted. Try again. ";
+        restore_init_state();
+    }
+    return true;
+}
 
+void app_viewer::restore_init_state() {
+    pts_.clear();
 }
