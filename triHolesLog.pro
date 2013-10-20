@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = convex-hull
+TARGET = triHolesLog
 
 CONFIG += QtGui
 QT += opengl
