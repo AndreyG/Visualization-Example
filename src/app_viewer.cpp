@@ -1,15 +1,20 @@
 #include "app_viewer.h"
 #include "stdafx.h"
+#include "drawer.h"
 
 void app_viewer::draw(drawer_type & drawer) const {
     drawer.set_color(Qt::blue);
     for (point_type const & pt : pts_)
         drawer.draw_point(pt, 3);
 
-    if (cnt_) {
-        drawer.set_color(Qt::red);
-        visualization::draw(drawer, *cnt_);
+    drawer.set_color(Qt::red);
+    for (uint i = 1; i < pts_.size(); i++) {
+        if (is_polygon_draw_state)
+            drawer.draw_line(segment_type(pts_[i - 1], pts_[i]));
+        else
+            drawer::drawArrow(drawer, segment_type(pts_[i - 1], pts_[i]));
     }
+
 }
 
 point_type app_viewer::get_info_pnt() const {
@@ -29,26 +34,25 @@ point_type app_viewer::get_error_pnt() const {
 void app_viewer::print(printer_type & printer) const {
     printer.corner_stream() << "Points num: " << pts_.size() << endl;
     stream_type& global_stream = printer.global_stream(get_error_pnt());
-    if(error_str != "")
+    if (error_str != "")
         global_stream << "ERROR: " << error_str;
-    
+
     stream_type& global_stream2 = printer.global_stream(get_info_pnt());
-    
+
     if (is_polygon_draw_state) {
         global_stream2 << endl << "Press SPACE button to STOP polygon drawing (last face will be added automatically)";
     } else {
         global_stream2 << endl << "Press SPACE button to START polygon drawing (remove previous).";
     }
 
-    
+
 }
 
 bool app_viewer::on_double_click(point_type const & pt) {
     if (is_polygon_draw_state) {
         return on_polygon_drawing_click(pt);
     }
-
-    return true;
+    return false;
 }
 
 bool app_viewer::on_key(int key) {
@@ -101,7 +105,7 @@ bool app_viewer::on_polygon_drawing_click(point_type const & pt) {
 }
 
 bool app_viewer::on_polygon_drawing_start() {
-    error_str = "";
+    restore_init_state();
     return true;
 }
 
@@ -110,14 +114,16 @@ bool app_viewer::on_polygon_drawing_stop() {
     error_str = "";
     if (pts_.size() < 3) {
         error_str = "Less than 3 point.";
+    } else {
+        pts_.push_back(pts_[0]);
     }
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
-        restore_init_state();
     }
     return true;
 }
 
 void app_viewer::restore_init_state() {
+    error_str = "";
     pts_.clear();
 }

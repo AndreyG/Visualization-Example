@@ -26,11 +26,11 @@ INCLUDEPATH += src \
                headers \
 
 HEADERS += headers/stdafx.h \
-           headers/app.h \
+           headers/algorithms.h \
            headers/app_viewer.h \
 
 SOURCES += src/main.cpp \
-           src/app.cpp \ 
+           src/algorithms.cpp \ 
            src/app_viewer.cpp \
 
 LIBS += -Lvisualization -lvisualization

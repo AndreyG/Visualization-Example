@@ -1,7 +1,7 @@
 #include "visualization/viewer_adapter.h"
 #include "visualization/draw_util.h"
 #include "io/point.h"
-#include "app.h"
+#include "algorithms.h"
 
 #include <iostream>
 
