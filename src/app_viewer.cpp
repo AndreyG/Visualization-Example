@@ -1,6 +1,7 @@
 #include "app_viewer.h"
 #include "stdafx.h"
 #include "drawer.h"
+#include "algorithms.h"
 
 void app_viewer::draw(drawer_type & drawer) const {
     drawer.set_color(Qt::blue);
@@ -14,6 +15,9 @@ void app_viewer::draw(drawer_type & drawer) const {
         else
             drawer::drawArrow(drawer, segment_type(pts_[i - 1], pts_[i]));
     }
+    
+    if(!is_polygon_draw_state && pts_.size() > 1)
+        drawer::drawArrow(drawer, segment_type(*pts_.rbegin(), *pts_.begin()));
 
 }
 
@@ -115,8 +119,9 @@ bool app_viewer::on_polygon_drawing_stop() {
     if (pts_.size() < 3) {
         error_str = "Less than 3 point.";
     } else {
-        pts_.push_back(pts_[0]);
+        geom::algorithms::orient_polygon_anticlockwise(pts_);
     }
+    
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
     }
