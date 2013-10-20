@@ -21,11 +21,15 @@ struct app_viewer : viewer_adapter
     bool on_polygon_drawing_stop();
     bool on_polygon_drawing_click(point_type const & pt);
     
+    point_type get_info_pnt() const;
+    point_type get_error_pnt() const;
     
+    void restore_init_state();
     
 private:
     std::vector<point_type>         pts_; 
     std::unique_ptr<contour_type>   cnt_;
+    std::string error_str = "";
     bool is_polygon_draw_state = false;
 };
 
