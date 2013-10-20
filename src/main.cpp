@@ -2,9 +2,9 @@
 
 #include "app_viewer.h"
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char ** argv) {
     QApplication app(argc, argv);
     app_viewer viewer;
     visualization::run_viewer(&viewer, "A point in a polygon");
 }
+

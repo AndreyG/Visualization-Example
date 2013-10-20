@@ -1,8 +1,9 @@
 Simple visualizer of the convex hull algorithm.
 
 Make project: 
-    git submodule update --init &&
-    cd visualization &&
+    git submodule update --init
+    cd visualization
+    (optionally rm PRECOMPILED_HEADER = stdafx.h in geom.visualization.pro)
     qmake && make
     cd ..
     qmake && make
@@ -11,3 +12,4 @@ Add point:           double click
 Build convex hull:   press key 'Enter'
 Save points:         press key 'S'
 Load points:         press key 'L'
+

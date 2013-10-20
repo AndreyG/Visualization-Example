@@ -1,3 +1,0 @@
-* Read points from cin
-* Show points in cin
-* Show intersection point in img

@@ -31,5 +31,6 @@ HEADERS += headers/stdafx.h \
 
 SOURCES += src/main.cpp \
            src/app.cpp \ 
+           src/app_viewer.cpp \
 
 LIBS += -Lvisualization -lvisualization

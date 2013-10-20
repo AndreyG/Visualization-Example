@@ -3,5 +3,5 @@ nbproject/*
 *.gch
 *.swp
 Makefile
-convex-hull
+triHolesLog
 
