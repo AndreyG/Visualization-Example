@@ -47,17 +47,12 @@ namespace geom {
                 return false;
             
             int res1 = left_turn(a[0], a[1], b[0]);
-            cout << "(" << a[0] << a[1] << b[0] << ") " << res1 << " ";
             res1 *= left_turn(a[0], a[1], b[1]);
-            cout << "(" << a[0] << a[1] << b[1] << ") " << res1 << " ";
 
             int res2 = left_turn(b[0], b[1], a[0]);
-            cout << "(" << b[0] << b[1] << a[0] << ") " << res2 << " ";
             res2 *= left_turn(b[0], b[1], a[1]);
-            cout << "(" << b[0] << b[1] << a[1] << ") " << res2 << " ";
             
-            return (res1 <= 0 || res2 <= 0);
-            // (37, 175)(-269, 134) - (-269, 112)(34, 156)
+            return (res1 <= 0 && res2 <= 0);
 
         }
 
