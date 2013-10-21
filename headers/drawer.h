@@ -23,7 +23,7 @@ namespace drawer {
         int xe = segment[1].x;
         int ye = segment[1].y;
 
-        for (float i = -0.6f; i <= 0.6l; i += 0.1) {
+        for (float i = -0.5f; i <= 0.5l; i += 0.1) {
             int xa = cos(angle + i) * 7 + xe;
             int ya = sin(angle + i) * 7 + ye;
             drawer.draw_line(segment_type(

@@ -62,8 +62,7 @@ bool app_viewer::on_double_click(point_type const & pt) {
 bool app_viewer::on_key(int key) {
     switch (key) {
         case Qt::Key_Space:
-            is_polygon_draw_state = !is_polygon_draw_state;
-            if (is_polygon_draw_state) return on_polygon_drawing_start();
+            if (!is_polygon_draw_state) return on_polygon_drawing_start();
             else return on_polygon_drawing_stop();
         case Qt::Key_Return:
             if (pts_.size() >= 2) {
@@ -93,9 +92,10 @@ bool app_viewer::on_key(int key) {
                 std::ifstream in(filename.c_str());
                 std::istream_iterator<point_type> beg(in), end;
 
-                pts_.assign(beg, end);
+                pts_.assign(beg, end);               
                 cnt_.reset();
-                return true;
+                // TODO: update it when holes will be available
+                return on_polygon_drawing_stop();
             }
         }
     }
@@ -109,6 +109,7 @@ bool app_viewer::on_polygon_drawing_click(point_type const & pt) {
 }
 
 bool app_viewer::on_polygon_drawing_start() {
+    is_polygon_draw_state = true;
     restore_init_state();
     return true;
 }
@@ -116,15 +117,18 @@ bool app_viewer::on_polygon_drawing_start() {
 bool app_viewer::on_polygon_drawing_stop() {
     // check correctness
     error_str = "";
+    geom::algorithms::orient_polygon_anticlockwise(pts_);
     if (pts_.size() < 3) {
         error_str = "Less than 3 point.";
-    } else {
-        geom::algorithms::orient_polygon_anticlockwise(pts_);
+    }
+    if(geom::algorithms::check_intersections(pts_)){
+        error_str = "Intersections detected.";
     }
     
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
     }
+    is_polygon_draw_state = false;
     return true;
 }
 
