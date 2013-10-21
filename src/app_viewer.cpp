@@ -44,9 +44,10 @@ void app_viewer::print(printer_type & printer) const {
     stream_type& global_stream2 = printer.global_stream(get_info_pnt());
 
     if (is_polygon_draw_state) {
-        global_stream2 << endl << "Press SPACE button to STOP polygon drawing (last face will be added automatically)";
+        global_stream2 << "Press SPACE button to STOP polygon drawing (last face will be added automatically)";
     } else {
-        global_stream2 << endl << "Press SPACE button to START polygon drawing (remove previous).";
+        global_stream2 << "Press SPACE button to START polygon drawing (remove previous).";
+        global_stream2 << " Or press H to start drawing a hole.";
     }
 
 
@@ -127,6 +128,9 @@ bool app_viewer::on_polygon_drawing_stop() {
     
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
+        is_polygon_loaded_successfully = false;
+    } else {
+        is_polygon_loaded_successfully = true;
     }
     is_polygon_draw_state = false;
     return true;

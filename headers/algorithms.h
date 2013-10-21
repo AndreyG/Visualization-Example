@@ -58,13 +58,10 @@ namespace geom {
 
         bool orient_polygon_anticlockwise(vector<point_type>& pts_) {
             if (pts_.size() < 2) return false;
-            auto minIt = min_element(pts_.begin(), pts_.end(),
-                    [](point_type a, point_type b) {
-                        return a.x < b.x; });
+            auto minIt = min_element(pts_.begin(), pts_.end());
             size_t minI = minIt - pts_.begin();
 
-            point_type left_most_v = pts_[minI] +
-                    geom::structures::vector_type(-1, 0);
+            point_type left_most_v = pts_[minI];
             point_type next_v = pts_[(minI + 1) % pts_.size()];
             point_type prev_v = pts_[(minI - 1 + pts_.size()) % pts_.size()];
 

@@ -2,7 +2,6 @@
 #include "visualization/draw_util.h"
 #include "io/point.h"
 
-
 #include <iostream>
 
 using namespace visualization;
@@ -30,5 +29,6 @@ private:
     std::unique_ptr<contour_type> cnt_;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
+    bool is_polygon_loaded_successfully = false;
 };
 
