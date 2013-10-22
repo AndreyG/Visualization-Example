@@ -6,17 +6,16 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include <stack>
 
 using namespace std;
 
 namespace geom {
     namespace algorithms {
+        
         // return true if polygon was oriented clockwise
-
         int left_turn(point_type a, point_type b, point_type c) {
-            
             int det = a.x * (b.y - c.y) - a.y * (b.x - c.x) + (b.x * c.y - b.y * c.x);
-            
             if (det > 0) return 1;
             if (det < 0) return -1;
             return 0;
@@ -76,7 +75,6 @@ namespace geom {
         }
 
         bool check_intersections(const vector<point_type>& pts_) {
-
             for (uint i = 0; i < pts_.size(); i++) {
                 const segment_type segmentA(
                         pts_[i],
@@ -103,9 +101,37 @@ namespace geom {
                     return true;
                 }
             }
-
             return false;
-
+        }
+        
+        void triangulate_monotonous(const vector<point_type>& pts, vector<segment_type>& res){
+            
+            cout << "tri begin" << endl;
+            size_t minI = min(pts.begin(), pts.end()) - pts.begin();
+            size_t maxI = max(pts.begin(), pts.end()) - pts.begin();
+            
+            size_t orderByXY[pts.size()];
+            for(size_t i = 0; i < pts.size(); i++) orderByXY[i] = i;
+            
+            
+            sort(orderByXY, orderByXY + pts.size(), [pts](size_t i, size_t j) {
+                return pts[i] < pts[j];
+            });
+        
+//            for(size_t i = 0; i < pts.size(); i++) cout << orderByXY[i] << " ";
+//            cout << endl;
+            
+            stack<size_t> st;
+            
+            
+            st.push(minI);
+            bool prevWasTop = true;
+            bool prevWasBottom = true;
+            
+            for(size_t i = 1; i < pts.size(); i++){
+                res.push_back(segment_type(pts[orderByXY[i]], pts[orderByXY[i-1]]));
+            }
+            
         }
 
     }

@@ -15,9 +15,14 @@ void app_viewer::draw(drawer_type & drawer) const {
         else
             drawer::drawArrow(drawer, segment_type(pts_[i - 1], pts_[i]));
     }
-    
-    if(!is_polygon_draw_state && pts_.size() > 1)
+
+    if (!is_polygon_draw_state && pts_.size() > 1)
         drawer::drawArrow(drawer, segment_type(*pts_.rbegin(), *pts_.begin()));
+    
+    drawer.set_color(Qt::yellow);
+    for(segment_type sg : tri_segms_) {
+        drawer.draw_line(sg);
+    }
 
 }
 
@@ -49,8 +54,6 @@ void app_viewer::print(printer_type & printer) const {
         global_stream2 << "Press SPACE button to START polygon drawing (remove previous).";
         global_stream2 << " Or press H to start drawing a hole.";
     }
-
-
 }
 
 bool app_viewer::on_double_click(point_type const & pt) {
@@ -61,6 +64,7 @@ bool app_viewer::on_double_click(point_type const & pt) {
 }
 
 bool app_viewer::on_key(int key) {
+    cout << key << endl;
     switch (key) {
         case Qt::Key_Space:
             if (!is_polygon_draw_state) return on_polygon_drawing_start();
@@ -70,6 +74,10 @@ bool app_viewer::on_key(int key) {
                 //            cnt_.reset(new contour_type(geom::algorithms::convex_hull::andrews(pts_)));
                 return true;
             }
+            break;
+        case Qt::Key_T:
+            on_triangulate();
+            return true;
             break;
         case Qt::Key_S:
         {
@@ -93,7 +101,7 @@ bool app_viewer::on_key(int key) {
                 std::ifstream in(filename.c_str());
                 std::istream_iterator<point_type> beg(in), end;
 
-                pts_.assign(beg, end);               
+                pts_.assign(beg, end);
                 cnt_.reset();
                 // TODO: update it when holes will be available
                 return on_polygon_drawing_stop();
@@ -122,10 +130,10 @@ bool app_viewer::on_polygon_drawing_stop() {
     if (pts_.size() < 3) {
         error_str = "Less than 3 point.";
     }
-    if(geom::algorithms::check_intersections(pts_)){
+    if (geom::algorithms::check_intersections(pts_)) {
         error_str = "Intersections detected.";
     }
-    
+
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
         is_polygon_loaded_successfully = false;
@@ -136,7 +144,14 @@ bool app_viewer::on_polygon_drawing_stop() {
     return true;
 }
 
+bool app_viewer::on_triangulate() {
+    tri_segms_.clear();
+    geom::algorithms::triangulate_monotonous(pts_, tri_segms_);
+    return true;
+}
+
 void app_viewer::restore_init_state() {
     error_str = "";
     pts_.clear();
+    tri_segms_.clear();
 }
