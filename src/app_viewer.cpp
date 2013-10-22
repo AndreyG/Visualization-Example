@@ -66,18 +66,17 @@ bool app_viewer::on_double_click(point_type const & pt) {
 bool app_viewer::on_key(int key) {
     cout << key << endl;
     switch (key) {
+        case Qt::Key_Escape:
+            get_wnd()->close();
+            break;
         case Qt::Key_Space:
             if (!is_polygon_draw_state) return on_polygon_drawing_start();
             else return on_polygon_drawing_stop();
         case Qt::Key_Return:
             if (pts_.size() >= 2) {
-                //            cnt_.reset(new contour_type(geom::algorithms::convex_hull::andrews(pts_)));
+                on_triangulate();
                 return true;
             }
-            break;
-        case Qt::Key_T:
-            on_triangulate();
-            return true;
             break;
         case Qt::Key_S:
         {

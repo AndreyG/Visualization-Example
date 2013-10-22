@@ -104,32 +104,64 @@ namespace geom {
             return false;
         }
         
-        void triangulate_monotonous(const vector<point_type>& pts, vector<segment_type>& res){
+        void triangulate_monotonous(const vector<point_type>& pts_, vector<segment_type>& res){
             
-            cout << "tri begin" << endl;
-            size_t minI = min(pts.begin(), pts.end()) - pts.begin();
+//            cout << "tri begin" << endl;
+//            for(int i = 0 ; i < pts_.size(); i++){
+//                cout << pts_[i] << " ";
+//            }
+//            cout << endl;
+            
+            vector<point_type> pts(pts_);
+            auto minIt = min(pts.begin(), pts.end());
+            rotate(pts.begin(), minIt, pts.end());
+            
+//            cout << "min value: " << *minIt << endl;
+//            cout << "min first (after rotate): " << pts[0] << endl;
+                    
             size_t maxI = max(pts.begin(), pts.end()) - pts.begin();
+            
+            cout << "maxI: " << maxI << endl;
             
             size_t orderByXY[pts.size()];
             for(size_t i = 0; i < pts.size(); i++) orderByXY[i] = i;
-            
-            
+                 
             sort(orderByXY, orderByXY + pts.size(), [pts](size_t i, size_t j) {
                 return pts[i] < pts[j];
             });
-        
-//            for(size_t i = 0; i < pts.size(); i++) cout << orderByXY[i] << " ";
-//            cout << endl;
-            
+           
             stack<size_t> st;
-            
-            
-            st.push(minI);
-            bool prevWasTop = true;
-            bool prevWasBottom = true;
-            
-            for(size_t i = 1; i < pts.size(); i++){
-                res.push_back(segment_type(pts[orderByXY[i]], pts[orderByXY[i-1]]));
+            st.push(orderByXY[0]);
+            st.push(orderByXY[1]);
+            for(size_t i = 2; i < pts.size() - 1; i++) {
+                bool prevWasTop = st.top() >= maxI;
+                bool meTop = orderByXY[i] >= maxI;
+                
+                if(prevWasTop != meTop){
+                    auto mostTop = st.top();
+                    while(!st.empty()){
+                        auto topP = pts[mostTop];
+                        st.pop();
+                        res.push_back(segment_type(topP, pts[orderByXY[i]]));
+                    }
+                    st.push(mostTop);
+                } else {
+                    while(st.size() > 2){
+                        auto topA = st.top();
+                        st.pop();
+                        auto topB = st.top();
+                        if(left_turn(pts[orderByXY[i]], pts[topA], pts[topB])){
+                            res.push_back(segment_type(pts[topB], pts[orderByXY[i]]));
+                        } else {
+                            st.push(topA);
+                            break;
+                        }
+                    }
+                }
+                
+                st.push(orderByXY[i]);
+                
+//                res.push_back(segment_type(pts[orderByXY[i]], pts[orderByXY[i-1]]));
             }
             
         }
