@@ -123,34 +123,30 @@ namespace geom {
             st.push(orderByXY[0]);
             st.push(orderByXY[1]);
 
-            for(size_t i = 2; i < pts.size() - 1; i++) {
+            for(size_t i = 2; i < pts.size() - 1 ; i++) {
                 bool prevWasTop = st.top() >= maxI;
                 bool meTop = orderByXY[i] >= maxI;
-                
-                if(i == pts.size() - 1) {
-                    meTop = !prevWasTop;
-                }
+                auto curPoint = pts[orderByXY[i]];
                 
                 if(prevWasTop != meTop) {
-                    auto mostTop = st.top();
+                    auto newTop = st.top();
                     while(st.size() > 1){
-                        auto topP = pts[st.top()];
+                        res.push_back(segment_type(pts[st.top()], curPoint));
                         st.pop();
-                        res.push_back(segment_type(topP, pts[orderByXY[i]]));
                     }
                     st.pop();
-                    st.push(mostTop);
+                    st.push(newTop);
                 } else {
-                    while(st.size() > 2) {
-                        auto topA = st.top();
+                    int currentTurn = meTop ? 1 : -1;
+                    while(st.size() > 1){
+                        auto bi = st.top();
                         st.pop();
-                        auto topB = st.top();
-                        int rightTurn = -1;
-                        if(meTop) rightTurn = 1;
-                        if(left_turn(pts[orderByXY[i]], pts[topA], pts[topB]) == rightTurn){
-                            res.push_back(segment_type(pts[topB], pts[orderByXY[i]]));
+                        auto ci = st.top();
+                        bool isRightTurn = left_turn(curPoint, pts[bi], pts[ci]) == currentTurn;
+                        if(isRightTurn){
+                            res.push_back(segment_type(curPoint, pts[ci]));
                         } else {
-                            st.push(topA);
+                            st.push(bi);
                             break;
                         }
                     }
