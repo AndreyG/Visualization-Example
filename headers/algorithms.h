@@ -115,8 +115,16 @@ namespace geom {
             
             size_t orderByXY[pts.size()];
             for(size_t i = 0; i < pts.size(); i++) orderByXY[i] = i;
-            sort(orderByXY, orderByXY + pts.size(), [pts](size_t i, size_t j) {
-                return pts[i] < pts[j];
+            sort(orderByXY, orderByXY + pts.size(), [pts, maxI](size_t i, size_t j) {
+                if(pts[i].x == pts[j].x){
+                    bool onTopI = i >= maxI;
+                    bool onTopJ = j >= maxI;
+                    if(onTopI != onTopJ)
+                        return onTopI ? true: false;
+                    if(onTopI) return i > j;
+                    return i < j;
+                }
+                return pts[i].x < pts[j].x;
             });
             
             stack<size_t> st;
