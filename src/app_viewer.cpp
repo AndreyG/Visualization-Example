@@ -92,6 +92,7 @@ bool app_viewer::on_key(int key) {
             break;
         case Qt::Key_L:
         {
+            on_polygon_drawing_start(); // imitate drawing (clear state)
             std::string filename = QFileDialog::getOpenFileName(
                     get_wnd(),
                     "Load Points"
@@ -99,11 +100,8 @@ bool app_viewer::on_key(int key) {
             if (filename != "") {
                 std::ifstream in(filename.c_str());
                 std::istream_iterator<point_type> beg(in), end;
-
-                pts_.assign(beg, end);
-                cnt_.reset();
                 // TODO: update it when holes will be available
-//                on_polygon_drawing_start(); // emullate drawing 
+                pts_.assign(beg, end);
                 return on_polygon_drawing_stop();
             }
         }
@@ -113,13 +111,12 @@ bool app_viewer::on_key(int key) {
 
 bool app_viewer::on_polygon_drawing_click(point_type const & pt) {
     pts_.push_back(pt);
-    cnt_.reset();
     return true;
 }
 
 bool app_viewer::on_polygon_drawing_start() {
-    is_polygon_draw_state = true;
     restore_init_state();
+    is_polygon_draw_state = true;
     return true;
 }
 
@@ -132,7 +129,6 @@ bool app_viewer::on_polygon_drawing_stop() {
     if (geom::algorithms::check_intersections(pts_)) {
         error_str = "Intersections detected.";
     }
-
     if (error_str.size() != 0) {
         error_str = error_str + " Polygon is deleted. Try again. ";
         is_polygon_loaded_successfully = false;
@@ -144,6 +140,7 @@ bool app_viewer::on_polygon_drawing_stop() {
 }
 
 bool app_viewer::on_triangulate() {
+    if(!is_polygon_loaded_successfully) return false;
     tri_segms_.clear();
     geom::algorithms::triangulate_monotonous(pts_, tri_segms_);
     return true;
@@ -151,6 +148,9 @@ bool app_viewer::on_triangulate() {
 
 void app_viewer::restore_init_state() {
     error_str = "";
+    is_polygon_draw_state = false;
+    is_polygon_loaded_successfully = false;
     pts_.clear();
     tri_segms_.clear();
+    cout << "restored" << endl;
 }

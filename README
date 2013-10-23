@@ -8,8 +8,10 @@ Make project:
     cd ..
     qmake && make
 
-Add point:           double click
-Build convex hull:   press key 'Enter'
+
+Space to space to start drawing polygon. Last edge will be added automatically!
+Add polygon point:   double click (in polygon drawing mode)
+Build triangulation: press key 'Enter' (only if polygon is loaded)
 Save points:         press key 'S'
 Load points:         press key 'L'
 
