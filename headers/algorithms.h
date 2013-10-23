@@ -105,33 +105,13 @@ namespace geom {
         }
         
         void triangulate_monotonous(const vector<point_type>& pts_, vector<segment_type>& res){
-            
-//            cout << "tri begin" << endl;
-//            for(int i = 0 ; i < pts_.size(); i++){
-//                cout << pts_[i] << " ";
-//            }
-//            cout << endl;
-            
+                        
             vector<point_type> pts(pts_);
-            cout << "points: ";
-            for (uint i = 0; i < pts.size(); i++) {
-                cout << pts[i] << " ";
-            }
-            cout << endl;
             auto minIt = min_element(pts.begin(), pts.end());
             
-            cout << "min point: " << *minIt << endl;
-            
             rotate(pts.begin(), minIt, pts.end());
-            cout << "rotated points: " << endl;
-            for(uint i = 0 ; i < pts.size(); i++){
-                cout << pts[i] << " ";
-            }
-            cout << endl;
        
             size_t maxI = max_element(pts.begin(), pts.end()) - pts.begin();
-            
-            cout << "maxI: " << maxI << endl;
             
             size_t orderByXY[pts.size()];
             for(size_t i = 0; i < pts.size(); i++) orderByXY[i] = i;
@@ -139,25 +119,17 @@ namespace geom {
                 return pts[i] < pts[j];
             });
             
-            cout << "order points: " << endl;
-            for (int i = 0; i < pts.size(); i++) {
-                cout << pts[orderByXY[i]] << " ";
-            }
-            cout << endl;
-           
             stack<size_t> st;
             st.push(orderByXY[0]);
             st.push(orderByXY[1]);
-            cout << "processing order: ";
+
             for(size_t i = 2; i < pts.size() - 1; i++) {
                 bool prevWasTop = st.top() >= maxI;
                 bool meTop = orderByXY[i] >= maxI;
                 
-//                if(i == pts.size() - 1) {
-//                    meTop = !prevWasTop;
-//                }
-                
-                cout << orderByXY[i] << " ";
+                if(i == pts.size() - 1) {
+                    meTop = !prevWasTop;
+                }
                 
                 if(prevWasTop != meTop) {
                     auto mostTop = st.top();
@@ -173,7 +145,9 @@ namespace geom {
                         auto topA = st.top();
                         st.pop();
                         auto topB = st.top();
-                        if(left_turn(pts[orderByXY[i]], pts[topA], pts[topB]) == -1){
+                        int rightTurn = -1;
+                        if(meTop) rightTurn = 1;
+                        if(left_turn(pts[orderByXY[i]], pts[topA], pts[topB]) == rightTurn){
                             res.push_back(segment_type(pts[topB], pts[orderByXY[i]]));
                         } else {
                             st.push(topA);
@@ -184,10 +158,8 @@ namespace geom {
                 
                 st.push(orderByXY[i]);
                 
-//                res.push_back(segment_type(pts[orderByXY[i]], pts[orderByXY[i-1]]));
             }
             
-            cout << endl;
             
         }
 

@@ -28,7 +28,6 @@ struct app_viewer : viewer_adapter {
 private:
     std::vector<point_type> pts_;
     std::vector<segment_type> tri_segms_;
-    std::unique_ptr<contour_type> cnt_;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
     bool is_polygon_loaded_successfully = false;
