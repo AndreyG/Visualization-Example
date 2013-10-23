@@ -156,6 +156,12 @@ namespace geom {
                 
             }
             
+            st.pop();
+            while(st.size() > 1){
+                res.push_back(segment_type(pts[st.top()], pts[maxI]));
+                st.pop();
+            }
+            
             
         }
 
