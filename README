@@ -1,4 +1,4 @@
-Simple visualizer of the convex hull algorithm.
+Monotonous polygon triangulation in O(n log n) time.
 
 Make project: 
     git submodule update --init
