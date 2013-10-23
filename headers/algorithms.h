@@ -153,18 +153,23 @@ namespace geom {
                 bool prevWasTop = st.top() >= maxI;
                 bool meTop = orderByXY[i] >= maxI;
                 
+//                if(i == pts.size() - 1) {
+//                    meTop = !prevWasTop;
+//                }
+                
                 cout << orderByXY[i] << " ";
                 
-                if(prevWasTop != meTop){
+                if(prevWasTop != meTop) {
                     auto mostTop = st.top();
-                    while(!st.empty()){
-                        auto topP = pts[mostTop];
+                    while(st.size() > 1){
+                        auto topP = pts[st.top()];
                         st.pop();
                         res.push_back(segment_type(topP, pts[orderByXY[i]]));
                     }
+                    st.pop();
                     st.push(mostTop);
                 } else {
-                    while(st.size() > 2){
+                    while(st.size() > 2) {
                         auto topA = st.top();
                         st.pop();
                         auto topB = st.top();

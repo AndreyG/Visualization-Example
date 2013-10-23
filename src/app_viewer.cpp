@@ -103,6 +103,7 @@ bool app_viewer::on_key(int key) {
                 pts_.assign(beg, end);
                 cnt_.reset();
                 // TODO: update it when holes will be available
+//                on_polygon_drawing_start(); // emullate drawing 
                 return on_polygon_drawing_stop();
             }
         }
@@ -124,7 +125,6 @@ bool app_viewer::on_polygon_drawing_start() {
 
 bool app_viewer::on_polygon_drawing_stop() {
     // check correctness
-    error_str = "";
     geom::algorithms::orient_polygon_anticlockwise(pts_);
     if (pts_.size() < 3) {
         error_str = "Less than 3 point.";
