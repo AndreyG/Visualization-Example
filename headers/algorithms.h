@@ -1,15 +1,16 @@
 #pragma once
 
-
+#include "stdafx.h"
 #include "geom/primitives/point.h"
 #include "geom/primitives/vector.h"
 #include "geom/primitives/segment.h"    
-
 
 using namespace std;
 
 namespace geom {
     namespace algorithms {
+        
+        using namespace geom::structures;
         
         // return true if polygon was oriented clockwise
         int left_turn(point_type a, point_type b, point_type c);
