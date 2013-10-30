@@ -16,12 +16,12 @@ void app_viewer::draw(drawer_type & drawer) const {
     for (uint i = 1; i < cur_drawing_pts.size(); i++) {
         drawer.draw_line(segment_type(cur_drawing_pts[i - 1], cur_drawing_pts[i]));
     }
-    
+
     drawer.set_color(Qt::red);
     drawer::drawPolygon(drawer, polygon);
-    
+
     drawer.set_color(Qt::blue);
-    for(polygon_type h: holes)
+    for (polygon_type h : holes)
         drawer::drawPolygon(drawer, h);
 
     drawer.set_color(Qt::yellow);
@@ -94,23 +94,52 @@ bool app_viewer::on_key(int key) {
                     ).toStdString();
             if (filename != "") {
                 std::ofstream out(filename.c_str());
-                boost::copy(cur_drawing_pts, std::ostream_iterator<point_type>(out, "\n"));
+                out << polygon.size() << endl;
+                for (point_type p : polygon)
+                    out << p << endl;
+                for (polygon_type hl : holes) {
+                    out << hl.size() << endl;
+                    for (point_type p : hl)
+                        out << p << endl;
+                }
+                out.close();
             }
         }
             break;
         case Qt::Key_L:
         {
-            on_polygon_drawing_start(); // imitate drawing (clear state)
+
             std::string filename = QFileDialog::getOpenFileName(
                     get_wnd(),
                     "Load Points"
                     ).toStdString();
             if (filename != "") {
                 std::ifstream in(filename.c_str());
-                std::istream_iterator<point_type> beg(in), end;
-                // TODO: update it when holes will be available
-                cur_drawing_pts.assign(beg, end);
-                return on_polygon_drawing_stop();
+                
+                int curI = 0;
+                while (!in.eof()) {
+                    size_t n;
+                    in >> n;
+
+                    if (curI == 0) {
+                        on_polygon_drawing_start();
+                    } else {
+                        on_hole_drawing_start();
+                    }
+                    for (size_t i = 0; i < n; i++) {
+                        point_type p;
+                        in >> p;
+                        cur_drawing_pts.push_back(p);
+                    }
+                    if (curI == 0) {
+                        on_polygon_drawing_stop();
+                    } else {
+                        on_hole_drawing_stop();
+                    }
+                    curI++;
+                }
+
+                return true;
             }
         }
     }
@@ -135,7 +164,7 @@ bool app_viewer::on_polygon_drawing_stop() {
         geom::algorithms::orient_polygon_clockwise(cur_drawing_pts);
     else
         geom::algorithms::orient_polygon_anticlockwise(cur_drawing_pts);
-    
+
     error_str = "";
     if (cur_drawing_pts.size() < 3) {
         error_str = "Less than 3 point.";
@@ -153,7 +182,7 @@ bool app_viewer::on_polygon_drawing_stop() {
         is_polygon_loaded_successfully = true;
     }
     is_polygon_draw_state = false;
-    if(error_str.empty()){
+    if (error_str.empty()) {
         if (!is_hole_draw_state) {
             polygon = cur_drawing_pts;
         } else {
@@ -178,6 +207,7 @@ void app_viewer::restore_init_state() {
     is_hole_draw_state = false;
     cur_drawing_pts.clear();
     polygon.clear();
+    holes.clear();
     tri_segms.clear();
     cout << "restored" << endl;
 }
@@ -190,4 +220,5 @@ bool app_viewer::on_hole_drawing_start() {
 bool app_viewer::on_hole_drawing_stop() {
     bool res = on_polygon_drawing_stop();
     is_hole_draw_state = false;
+    return res;
 }
