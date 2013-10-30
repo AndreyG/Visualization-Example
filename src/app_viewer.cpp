@@ -16,14 +16,13 @@ void app_viewer::draw(drawer_type & drawer) const {
     for (uint i = 1; i < cur_drawing_pts.size(); i++) {
         drawer.draw_line(segment_type(cur_drawing_pts[i - 1], cur_drawing_pts[i]));
     }
-
+    
     drawer.set_color(Qt::red);
-    for (uint i = 0; i < polygon.size(); i++) {
-        drawer::drawArrow(drawer, segment_type(
-                cur_drawing_pts[i],
-                cur_drawing_pts[(i + 1) % polygon.size()])
-                );
-    }
+    drawer::drawPolygon(drawer, polygon);
+    
+    drawer.set_color(Qt::blue);
+    for(polygon_type h: holes)
+        drawer::drawPolygon(drawer, h);
 
     drawer.set_color(Qt::yellow);
     for (segment_type sg : tri_segms) {
@@ -136,7 +135,8 @@ bool app_viewer::on_polygon_drawing_stop() {
         geom::algorithms::orient_polygon_clockwise(cur_drawing_pts);
     else
         geom::algorithms::orient_polygon_anticlockwise(cur_drawing_pts);
-
+    
+    error_str = "";
     if (cur_drawing_pts.size() < 3) {
         error_str = "Less than 3 point.";
     }
@@ -153,11 +153,12 @@ bool app_viewer::on_polygon_drawing_stop() {
         is_polygon_loaded_successfully = true;
     }
     is_polygon_draw_state = false;
-
-    if (!is_hole_draw_state) {
-        polygon = cur_drawing_pts;
-    } else {
-        holes.push_back(cur_drawing_pts);
+    if(error_str.empty()){
+        if (!is_hole_draw_state) {
+            polygon = cur_drawing_pts;
+        } else {
+            holes.push_back(cur_drawing_pts);
+        }
     }
     cur_drawing_pts.clear();
     return true;

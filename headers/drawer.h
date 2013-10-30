@@ -34,5 +34,16 @@ namespace drawer {
 
     }
 
+    void drawPolygon(drawer_type& drawer, const std::vector<point_type>& polygon,
+            double width = 1.0) {
+        for (uint i = 0; i < polygon.size(); i++) {
+            drawer::drawArrow(drawer, segment_type(
+                    polygon[i],
+                    polygon[(i + 1) % polygon.size()]),
+                    width
+                    );
+        }
+    }
+
 }
 
