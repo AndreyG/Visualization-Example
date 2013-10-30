@@ -175,12 +175,14 @@ bool app_viewer::on_polygon_drawing_stop() {
     if (geom::algorithms::check_intersections(cur_drawing_pts)) {
         error_str = "Intersections detected.";
     }
-    if (error_str.size() != 0) {
+    if (error_str != "") {
         if (is_hole_draw_state)
             error_str += " The hole is deleted. Try again.";
-        else
+        else{
             error_str += " The polygon is deleted. Try again.";
-        is_polygon_loaded_successfully = false;
+            is_polygon_loaded_successfully = false;
+        }
+        
     } else {
         is_polygon_loaded_successfully = true;
     }
@@ -216,6 +218,11 @@ void app_viewer::restore_init_state() {
 }
 
 bool app_viewer::on_hole_drawing_start() {
+    if(!is_polygon_loaded_successfully){
+        error_str = "Can't draw holes in empty polygon";
+        is_hole_draw_state = false;
+        return true;
+    }
     is_hole_draw_state = true;
     return on_polygon_drawing_start();
 }
