@@ -5,6 +5,6 @@
 int main(int argc, char ** argv) {
     QApplication app(argc, argv);
     app_viewer viewer;
-    visualization::run_viewer(&viewer, "A point in a polygon");
+    visualization::run_viewer(&viewer, "Polygon triangulation");
 }
 

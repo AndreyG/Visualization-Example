@@ -5,14 +5,12 @@
 #include <iostream>
 #include <math.h>
 #include <stack>
-
+#include <queue>
 #include "io/point.h"
-
-
 
 namespace geom {
     namespace algorithms {
-        
+
         int left_turn(point_type a, point_type b, point_type c) {
             int det = a.x * (b.y - c.y) - a.y * (b.x - c.x) + (b.x * c.y - b.y * c.x);
             if (det > 0) return 1;
@@ -112,23 +110,21 @@ namespace geom {
 
             size_t maxI = max_element(pts.begin(), pts.end()) - pts.begin();
 
-            size_t orderByXY[pts.size()];
-            for (size_t i = 0; i < pts.size(); i++) orderByXY[i] = i;
-            sort(orderByXY, orderByXY + pts.size(), [pts, maxI](size_t i, size_t j) {
-                if (pts[i].x == pts[j].x) {
-                    bool onTopI = i >= maxI;
-                    bool onTopJ = j >= maxI;
-                    if (onTopI != onTopJ)
-                        return onTopI ? true : false;
-                    if (onTopI) return i > j;
-                    return i < j;
+            vector<size_t> orderByXY;
+            size_t upI = pts.size() - 1;
+            size_t lowI = 0;
+            while (upI >= maxI || lowI < maxI) {
+                if (upI < maxI || pts[lowI] < pts[upI]) {
+                    orderByXY.push_back(lowI++);
+                    continue;
                 }
-                return pts[i].x < pts[j].x;
-            });
+                orderByXY.push_back(upI--);
+            }
 
             stack<size_t> st;
             st.push(orderByXY[0]);
             st.push(orderByXY[1]);
+
 
             for (size_t i = 2; i < pts.size() - 1; i++) {
                 bool prevWasTop = st.top() >= maxI;
