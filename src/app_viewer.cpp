@@ -158,6 +158,7 @@ bool app_viewer::on_polygon_drawing_start() {
     if (!is_hole_draw_state)
         restore_init_state();
     is_polygon_draw_state = true;
+    error_str = "";
     return true;
 }
 
@@ -168,12 +169,16 @@ bool app_viewer::on_polygon_drawing_stop() {
     else
         geom::algorithms::orient_polygon_anticlockwise(cur_drawing_pts);
 
-    error_str = "";
     if (cur_drawing_pts.size() < 3) {
         error_str = "Less than 3 point.";
     }
     if (geom::algorithms::check_intersections(cur_drawing_pts)) {
         error_str = "Intersections detected.";
+    }
+    if(is_hole_draw_state){
+        if(!geom::algorithms::is_polygon_inside(polygon, cur_drawing_pts)){
+            error_str = "The hole is outside of polygon. ";
+        }
     }
     if (error_str != "") {
         if (is_hole_draw_state)
@@ -214,7 +219,6 @@ void app_viewer::restore_init_state() {
     polygon.clear();
     holes.clear();
     tri_segms.clear();
-    cout << "restored" << endl;
 }
 
 bool app_viewer::on_hole_drawing_start() {

@@ -29,7 +29,13 @@ namespace geom {
         
         void triangulate_monotonous(const vector<point_type>& pts_, 
                 vector<segment_type>& res);
-
+        
+        bool is_point_strong_inside(const vector<point_type>& polygon,
+                const point_type& point);
+        
+        bool is_polygon_inside(const vector<point_type>& polygonOuter, 
+                const vector<point_type>& polygonIn);
     }
+    
 }
 

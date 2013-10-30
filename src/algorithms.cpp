@@ -172,7 +172,27 @@ namespace geom {
 
 
         }
-
+        
+        bool is_point_inside(const vector<point_type>& polygon, const point_type& point) {
+            int32 minx = min_element(polygon.begin(), polygon.end()) -> x;
+            segment_type ray(point_type(minx - 1, point.y + 1), point);
+            bool inside = false;
+            for(size_t i = 0; i < polygon.size(); i++ ){
+                point_type from = polygon[i];
+                point_type to = polygon[(i + 1) % polygon.size()];
+                if(segments_intersected(segment_type(from, to), ray))
+                    inside = !inside;
+            }
+            return inside;
+        }
+        
+        bool is_polygon_inside(const vector<point_type>& polygonOuter, const vector<point_type>& polygonIn){
+            for(auto p: polygonIn){
+                if(!is_point_inside(polygonOuter, p)) return false;
+            }
+            return true;
+        }
+        
     }
 }
 
