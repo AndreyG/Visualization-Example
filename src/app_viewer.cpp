@@ -101,14 +101,13 @@ bool app_viewer::save_state() {
             ).toStdString();
     if (filename == "") return false;
     std::ofstream out(filename.c_str());
-    out << polygon.size() - 1 << endl;
-    // we know how get last point.
-    for(int i = 0; i < (int)polygon.size() - 1; i ++){
+    out << polygon.size() << endl;
+    for(int i = 0; i < (int)polygon.size(); i ++){
         out << polygon[i] << endl;
     }
     for (polygon_type hl : holes) {
-        out << hl.size() - 1 << endl;
-        for (int i = 0; i < (int)hl.size() - 1; i++) {
+        out << hl.size()<< endl;
+        for (int i = 0; i < (int)hl.size(); i++) {
             out << hl[i] << endl;
         }
     }
@@ -178,6 +177,9 @@ bool app_viewer::on_polygon_drawing_stop() {
     if(is_hole_draw_state){
         if(!geom::algorithms::is_polygon_inside(polygon, cur_drawing_pts)){
             error_str = "The hole is outside of polygon. ";
+        }
+        if(geom::algorithms::is_polygons_intersected(holes, cur_drawing_pts)){
+            error_str = "The hole is intersected with an other hole";
         }
     }
     if (error_str != "") {

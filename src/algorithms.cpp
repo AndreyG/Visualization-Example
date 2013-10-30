@@ -193,6 +193,29 @@ namespace geom {
             return true;
         }
         
+        bool is_polygons_intersected(const vector<point_type>& polygonA, const vector<point_type>& polygonB){
+            for (size_t i = 0; i < polygonA.size(); i++) {
+                point_type froma = polygonA[i];
+                point_type toa = polygonA[(i + 1) % polygonA.size()];
+                segment_type sa(froma, toa);
+                for (size_t j = 0; j < polygonB.size(); j++) {
+                    point_type fromb = polygonB[i];
+                    point_type tob = polygonB[(i + 1) % polygonB.size()];
+                    segment_type sb(fromb, tob);
+                    if(segments_intersected(sa, sb)) return true;
+                }
+            }
+            return false;
+        }
+        
+        bool is_polygons_intersected(const vector<vector<point_type> >& polygons, 
+                const vector<point_type>& polygon){
+            for(auto p : polygons){
+                if(is_polygons_intersected(p, polygon)) return true;
+            }
+            return false;
+        }
+        
     }
 }
 

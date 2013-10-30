@@ -35,6 +35,10 @@ namespace geom {
         
         bool is_polygon_inside(const vector<point_type>& polygonOuter, 
                 const vector<point_type>& polygonIn);
+        bool is_polygons_intersected(const vector<point_type>& polygonA, 
+                const vector<point_type>& polygonB);
+        bool is_polygons_intersected(const vector<vector<point_type> >& polygons,
+                const vector<point_type>& polygon);
     }
     
 }
