@@ -69,7 +69,6 @@ bool app_viewer::on_double_click(point_type const & pt) {
 }
 
 bool app_viewer::on_key(int key) {
-    cout << key << endl;
     switch (key) {
         case Qt::Key_Escape:
             get_wnd()->close();
@@ -87,63 +86,67 @@ bool app_viewer::on_key(int key) {
             }
             break;
         case Qt::Key_S:
-        {
-            std::string filename = QFileDialog::getSaveFileName(
-                    get_wnd(),
-                    "Save Points"
-                    ).toStdString();
-            if (filename != "") {
-                std::ofstream out(filename.c_str());
-                out << polygon.size() << endl;
-                for (point_type p : polygon)
-                    out << p << endl;
-                for (polygon_type hl : holes) {
-                    out << hl.size() << endl;
-                    for (point_type p : hl)
-                        out << p << endl;
-                }
-                out.close();
-            }
-        }
-            break;
+            return save_state();
+
         case Qt::Key_L:
-        {
-
-            std::string filename = QFileDialog::getOpenFileName(
-                    get_wnd(),
-                    "Load Points"
-                    ).toStdString();
-            if (filename != "") {
-                std::ifstream in(filename.c_str());
-                
-                int curI = 0;
-                while (!in.eof()) {
-                    size_t n;
-                    in >> n;
-
-                    if (curI == 0) {
-                        on_polygon_drawing_start();
-                    } else {
-                        on_hole_drawing_start();
-                    }
-                    for (size_t i = 0; i < n; i++) {
-                        point_type p;
-                        in >> p;
-                        cur_drawing_pts.push_back(p);
-                    }
-                    if (curI == 0) {
-                        on_polygon_drawing_stop();
-                    } else {
-                        on_hole_drawing_stop();
-                    }
-                    curI++;
-                }
-
-                return true;
-            }
-        }
+            return load_state();
     }
     return false;
+}
+
+bool app_viewer::save_state() {
+    std::string filename = QFileDialog::getSaveFileName(
+            get_wnd(),
+            "Save Points"
+            ).toStdString();
+    if (filename == "") return false;
+    std::ofstream out(filename.c_str());
+    out << polygon.size() - 1 << endl;
+    // we know how get last point.
+    for(int i = 0; i < (int)polygon.size() - 1; i ++){
+        out << polygon[i] << endl;
+    }
+    for (polygon_type hl : holes) {
+        out << hl.size() - 1 << endl;
+        for (int i = 0; i < (int)hl.size() - 1; i++) {
+            out << hl[i] << endl;
+        }
+    }
+    out.close();
+    return true;
+}
+
+bool app_viewer::load_state() {
+    std::string filename = QFileDialog::getOpenFileName(
+            get_wnd(),
+            "Load Points"
+            ).toStdString();
+    if (filename == "") return false;
+    std::ifstream in(filename.c_str());
+
+    int curI = 0;
+    while (true) {
+        int n;
+        in >> n;
+        if(in.eof()) break;
+        point_type p;
+        if (curI == 0) {
+            on_polygon_drawing_start();
+        } else {
+            on_hole_drawing_start();
+        }
+        for (int i = 0; i < n; i++) {
+            in >> p;
+            cur_drawing_pts.push_back(p);
+        }
+        if (curI == 0) {
+            on_polygon_drawing_stop();
+        } else {
+            on_hole_drawing_stop();
+        }
+        curI++;
+    }
+    return true;
 }
 
 bool app_viewer::on_polygon_drawing_click(point_type const & pt) {

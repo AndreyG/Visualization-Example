@@ -27,6 +27,9 @@ struct app_viewer : viewer_adapter {
 
     void restore_init_state();
     
+    bool save_state();
+    bool load_state();
+    
     typedef std::vector<point_type> polygon_type;
     
 private:
