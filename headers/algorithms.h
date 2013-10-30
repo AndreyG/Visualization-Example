@@ -22,6 +22,8 @@ namespace geom {
         bool segments_intersected(const segment_type& a, const segment_type& b);
 
         bool orient_polygon_anticlockwise(vector<point_type>& pts_);
+        
+        bool orient_polygon_clockwise(vector<point_type>& pts_);
 
         bool check_intersections(const vector<point_type>& pts_);
         

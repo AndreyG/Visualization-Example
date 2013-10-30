@@ -19,17 +19,24 @@ struct app_viewer : viewer_adapter {
 
     bool on_polygon_drawing_start();
     bool on_polygon_drawing_stop();
+    bool on_hole_drawing_start();
+    bool on_hole_drawing_stop();
     bool on_polygon_drawing_click(point_type const & pt);
     
     bool on_triangulate();
 
     void restore_init_state();
-
+    
+    typedef std::vector<point_type> polygon_type;
+    
 private:
-    std::vector<point_type> pts_;
-    std::vector<segment_type> tri_segms_;
+    polygon_type polygon;
+    std::vector<point_type> cur_drawing_pts;   // polygon
+    std::vector<segment_type> tri_segms;       // result after triangulation
+    std::vector<polygon_type> holes;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
     bool is_polygon_loaded_successfully = false;
+    bool is_hole_draw_state = false;
 };
 

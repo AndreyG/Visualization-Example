@@ -5,7 +5,6 @@
 #include <iostream>
 #include <math.h>
 #include <stack>
-#include <queue>
 #include "io/point.h"
 
 namespace geom {
@@ -69,6 +68,12 @@ namespace geom {
             reverse(pts_.begin(), pts_.end());
 
             return false;
+        }
+        
+        bool orient_polygon_clockwise(vector<point_type>& pts_){
+            bool res = orient_polygon_anticlockwise(pts_);
+            reverse(pts_.begin(), pts_.end());
+            return !res;
         }
 
         bool check_intersections(const vector<point_type>& pts_) {
