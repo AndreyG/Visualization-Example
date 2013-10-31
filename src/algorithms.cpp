@@ -258,7 +258,7 @@ namespace geom {
             if (pme.x > pbefore.x && pme.x > pafter.x) {
                 auto turn = left_turn(pbefore, pme, pafter);
                 if (isInHole) turn *= -1;
-                if (turn < 0) return TRIP_END;
+                if (turn > 0) return TRIP_END;
                 else return TRIP_MERGE;
             }
 

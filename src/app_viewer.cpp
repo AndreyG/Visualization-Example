@@ -220,6 +220,7 @@ void app_viewer::restore_init_state() {
     is_polygon_draw_state = false;
     is_polygon_loaded_successfully = false;
     is_hole_draw_state = false;
+    point_marks.clear();
     cur_drawing_pts.clear();
     polygon.clear();
     holes.clear();
