@@ -69,8 +69,8 @@ namespace geom {
 
             return false;
         }
-        
-        bool orient_polygon_clockwise(vector<point_type>& pts_){
+
+        bool orient_polygon_clockwise(vector<point_type>& pts_) {
             bool res = orient_polygon_anticlockwise(pts_);
             reverse(pts_.begin(), pts_.end());
             return !res;
@@ -172,28 +172,28 @@ namespace geom {
 
 
         }
-        
+
         bool is_point_inside(const vector<point_type>& polygon, const point_type& point) {
             int32 minx = min_element(polygon.begin(), polygon.end()) -> x;
             segment_type ray(point_type(minx - 1, point.y + 1), point);
             bool inside = false;
-            for(size_t i = 0; i < polygon.size(); i++ ){
+            for (size_t i = 0; i < polygon.size(); i++) {
                 point_type from = polygon[i];
                 point_type to = polygon[(i + 1) % polygon.size()];
-                if(segments_intersected(segment_type(from, to), ray))
+                if (segments_intersected(segment_type(from, to), ray))
                     inside = !inside;
             }
             return inside;
         }
-        
-        bool is_polygon_inside(const vector<point_type>& polygonOuter, const vector<point_type>& polygonIn){
-            for(auto p: polygonIn){
-                if(!is_point_inside(polygonOuter, p)) return false;
+
+        bool is_polygon_inside(const vector<point_type>& polygonOuter, const vector<point_type>& polygonIn) {
+            for (auto p : polygonIn) {
+                if (!is_point_inside(polygonOuter, p)) return false;
             }
             return true;
         }
-        
-        bool is_polygons_intersected(const vector<point_type>& polygonA, const vector<point_type>& polygonB){
+
+        bool is_polygons_intersected(const vector<point_type>& polygonA, const vector<point_type>& polygonB) {
             for (size_t i = 0; i < polygonA.size(); i++) {
                 point_type froma = polygonA[i];
                 point_type toa = polygonA[(i + 1) % polygonA.size()];
@@ -202,20 +202,70 @@ namespace geom {
                     point_type fromb = polygonB[i];
                     point_type tob = polygonB[(i + 1) % polygonB.size()];
                     segment_type sb(fromb, tob);
-                    if(segments_intersected(sa, sb)) return true;
+                    if (segments_intersected(sa, sb)) return true;
                 }
             }
             return false;
         }
-        
-        bool is_polygons_intersected(const vector<vector<point_type> >& polygons, 
-                const vector<point_type>& polygon){
-            for(auto p : polygons){
-                if(is_polygons_intersected(p, polygon)) return true;
+
+        bool is_polygons_intersected(const vector<vector<point_type> >& polygons,
+                const vector<point_type>& polygon) {
+            for (auto p : polygons) {
+                if (is_polygons_intersected(p, polygon)) return true;
             }
             return false;
         }
-        
+
+        vector<pair<point_type, TRIP_TYPE> > triangulate_with_holes(
+                const vector<point_type>& polygon, 
+                const vector<vector<point_type> >& holes) {
+
+            vector<pair<point_type, TRIP_TYPE> > typesRes;
+            
+            for(size_t i = 0; i < polygon.size(); i++){
+                typesRes.push_back(
+                        make_pair(polygon[i], getTripType(polygon, i, false)));
+            }
+            
+            for(auto hole: holes)
+            for (size_t i = 0; i < hole.size(); i++) {
+                typesRes.push_back(
+                            make_pair(hole[i], getTripType(hole, i, false)));
+            }
+            
+            return typesRes;
+
+        }
+
+        TRIP_TYPE getTripType(const vector<point_type>& polygon, size_t index,
+                bool isInHole) {
+            auto pbefore = polygon[(index > 0) ? index - 1 : polygon.size() - 1];
+            auto pafter = polygon[(index < polygon.size() - 1) ? index + 1 : 0];
+
+            auto pme = polygon[index];
+
+            if (pbefore.x < pme.x && pme.x < pafter.x) {
+                return TRIP_REGULAR;
+            }
+
+            if (pme.x < pbefore.x && pme.x < pafter.x) {
+                auto turn = left_turn(pbefore, pme, pafter);
+                if (isInHole) turn *= -1;
+                if (turn > 0) return TRIP_START;
+                else return TRIP_SPLIT;
+            }
+
+            if (pme.x > pbefore.x && pme.x > pafter.x) {
+                auto turn = left_turn(pbefore, pme, pafter);
+                if (isInHole) turn *= -1;
+                if (turn < 0) return TRIP_END;
+                else return TRIP_MERGE;
+            }
+
+            return TRIP_REGULAR;
+
+        }
+
     }
 }
 

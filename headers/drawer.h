@@ -2,6 +2,7 @@
 #include "geom/primitives/segment.h"
 #include "geom/primitives/vector.h"
 #include "visualization/viewer.h"
+#include "algorithms.h"
 
 #include "math.h"
 
@@ -9,7 +10,9 @@ using namespace geom::structures;
 using namespace visualization;
 
 namespace drawer {
-
+    
+    using namespace geom::algorithms;
+    
     void drawArrow(drawer_type& drawer, const segment_type& segment,
             double width = 1.0) {
 
@@ -44,6 +47,37 @@ namespace drawer {
                     );
         }
     }
-
+    
+    void drawTripVertex(drawer_type& drawer, const point_type& point, TRIP_TYPE type){
+        cout << point << type << endl;
+        point_type a(point);
+        point_type b(point);
+        a.x -= 5;
+        b.x += 5;
+        switch(type) {
+            case TRIP_REGULAR:        
+                drawer.set_color(Qt::green);
+                cout << "reg";
+                break;
+            case TRIP_START:
+                drawer.set_color(Qt::red);
+                cout << "start";
+                break;
+            case TRIP_SPLIT:
+                cout << "split";
+                drawer.set_color(Qt::cyan);
+                break;
+            case TRIP_END:
+                cout << "end";
+                drawer.set_color(Qt::blue);
+                break;
+            case TRIP_MERGE:
+                cout << "merge";
+                drawer.set_color(Qt::darkGreen);
+                break;
+        }
+        drawer.draw_line(segment_type(a, b), 10);
+    }
+    
 }
 

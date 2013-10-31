@@ -29,6 +29,10 @@ void app_viewer::draw(drawer_type & drawer) const {
         drawer.draw_line(sg);
     }
 
+    for (auto p : point_marks) {
+        drawer::drawTripVertex(drawer, p.first, p.second);
+    }
+
 }
 
 point_type app_viewer::get_info_pnt() const {
@@ -80,10 +84,9 @@ bool app_viewer::on_key(int key) {
             if (!is_hole_draw_state) return on_hole_drawing_start();
             else return on_hole_drawing_stop();
         case Qt::Key_Return:
-            if (cur_drawing_pts.size() >= 2) {
-                on_triangulate();
-                return true;
-            }
+            if (!is_polygon_loaded_successfully) return false;
+            point_marks = geom::algorithms::triangulate_with_holes(polygon, holes);
+            return true;
             break;
         case Qt::Key_S:
             return save_state();
@@ -102,12 +105,12 @@ bool app_viewer::save_state() {
     if (filename == "") return false;
     std::ofstream out(filename.c_str());
     out << polygon.size() << endl;
-    for(int i = 0; i < (int)polygon.size(); i ++){
+    for (int i = 0; i < (int) polygon.size(); i++) {
         out << polygon[i] << endl;
     }
     for (polygon_type hl : holes) {
-        out << hl.size()<< endl;
-        for (int i = 0; i < (int)hl.size(); i++) {
+        out << hl.size() << endl;
+        for (int i = 0; i < (int) hl.size(); i++) {
             out << hl[i] << endl;
         }
     }
@@ -127,7 +130,7 @@ bool app_viewer::load_state() {
     while (true) {
         int n;
         in >> n;
-        if(in.eof()) break;
+        if (in.eof()) break;
         point_type p;
         if (curI == 0) {
             on_polygon_drawing_start();
@@ -174,22 +177,22 @@ bool app_viewer::on_polygon_drawing_stop() {
     if (geom::algorithms::check_intersections(cur_drawing_pts)) {
         error_str = "Intersections detected.";
     }
-    if(is_hole_draw_state){
-        if(!geom::algorithms::is_polygon_inside(polygon, cur_drawing_pts)){
+    if (is_hole_draw_state) {
+        if (!geom::algorithms::is_polygon_inside(polygon, cur_drawing_pts)) {
             error_str = "The hole is outside of polygon. ";
         }
-        if(geom::algorithms::is_polygons_intersected(holes, cur_drawing_pts)){
+        if (geom::algorithms::is_polygons_intersected(holes, cur_drawing_pts)) {
             error_str = "The hole is intersected with an other hole";
         }
     }
     if (error_str != "") {
         if (is_hole_draw_state)
             error_str += " The hole is deleted. Try again.";
-        else{
+        else {
             error_str += " The polygon is deleted. Try again.";
             is_polygon_loaded_successfully = false;
         }
-        
+
     } else {
         is_polygon_loaded_successfully = true;
     }
@@ -224,7 +227,7 @@ void app_viewer::restore_init_state() {
 }
 
 bool app_viewer::on_hole_drawing_start() {
-    if(!is_polygon_loaded_successfully){
+    if (!is_polygon_loaded_successfully) {
         error_str = "Can't draw holes in empty polygon";
         is_hole_draw_state = false;
         return true;

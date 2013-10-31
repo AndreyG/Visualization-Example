@@ -1,8 +1,12 @@
+#pragma once
+
 #include "visualization/viewer_adapter.h"
 #include "visualization/draw_util.h"
 #include "io/point.h"
 
+#include "algorithms.h"
 #include <iostream>
+
 
 using namespace visualization;
 using geom::structures::point_type;
@@ -37,6 +41,7 @@ private:
     std::vector<point_type> cur_drawing_pts;   // polygon
     std::vector<segment_type> tri_segms;       // result after triangulation
     std::vector<polygon_type> holes;
+    std::vector<std::pair<point_type, geom::algorithms::TRIP_TYPE> > point_marks;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
     bool is_polygon_loaded_successfully = false;
