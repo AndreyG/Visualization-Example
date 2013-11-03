@@ -17,6 +17,7 @@ struct app_viewer : viewer_adapter {
     void print(printer_type & printer) const;
     point_type get_info_pnt() const;
     point_type get_error_pnt() const;
+    point_type get_legend_pnt() const;
 
     bool on_double_click(point_type const & pt);
     bool on_key(int key);

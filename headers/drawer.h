@@ -10,9 +10,9 @@ using namespace geom::structures;
 using namespace visualization;
 
 namespace drawer {
-    
+
     using namespace geom::algorithms;
-    
+
     void drawArrow(drawer_type& drawer, const segment_type& segment,
             double width = 1.0) {
 
@@ -47,15 +47,15 @@ namespace drawer {
                     );
         }
     }
-    
-    void drawTripVertex(drawer_type& drawer, const point_type& point, TRIP_TYPE type){
+
+    void drawTripVertex(drawer_type& drawer, const point_type& point, TRIP_TYPE type) {
         cout << point << type << endl;
         point_type a(point);
         point_type b(point);
         a.x -= 5;
         b.x += 5;
-        switch(type) {
-            case TRIP_REGULAR:        
+        switch (type) {
+            case TRIP_REGULAR:
                 drawer.set_color(Qt::green);
                 cout << "reg";
                 break;
@@ -78,6 +78,22 @@ namespace drawer {
         }
         drawer.draw_line(segment_type(a, b), 10);
     }
-    
+
+    void drawLegend(drawer_type& drawer, const point_type& point) {
+
+        // regular start split end merge
+
+        int offsetset[] = { 80, 78, 60, 57, 55}; // n - 1
+
+        TRIP_TYPE types[] = {TRIP_REGULAR, TRIP_START, TRIP_SPLIT,
+            TRIP_END, TRIP_MERGE};
+        point_type curPoint = point;
+        for (int i = 0; i < 5; i++) {
+            curPoint = point_type(curPoint.x + offsetset[i], point.y + 3);
+            drawTripVertex(drawer, curPoint, types[i]);
+        }
+
+    }
+
 }
 

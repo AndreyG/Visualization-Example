@@ -31,8 +31,19 @@ void app_viewer::draw(drawer_type & drawer) const {
 
     for (auto p : point_marks) {
         drawer::drawTripVertex(drawer, p.first, p.second);
-    }
+    }            
 
+    drawer::drawLegend(drawer, get_legend_pnt());
+
+}
+
+point_type app_viewer::get_legend_pnt() const {
+
+    return point_type(
+            -get_wnd()->width() / 2 + 10,
+            -get_wnd()->height() / 2 + 30
+            );
+    
 }
 
 point_type app_viewer::get_info_pnt() const {
@@ -45,7 +56,7 @@ point_type app_viewer::get_info_pnt() const {
 point_type app_viewer::get_error_pnt() const {
     return point_type(
             -get_wnd()->width() / 2 + 10,
-            -get_wnd()->height() / 2 + 30
+            -get_wnd()->height() / 2 + 50
             );
 }
 
@@ -63,6 +74,15 @@ void app_viewer::print(printer_type & printer) const {
         global_stream2 << "Press SPACE button to START polygon drawing (remove previous).";
         global_stream2 << " Or press H to start drawing a hole.";
     }
+    
+    stream_type& global_stream3 = printer.global_stream(get_legend_pnt());
+    global_stream3 << "LEGEND:";
+    global_stream3 << "         regular";
+    global_stream3 << "         start";
+    global_stream3 << "         split";
+    global_stream3 << "         end";
+    global_stream3 << "         merge";
+    
 }
 
 bool app_viewer::on_double_click(point_type const & pt) {
