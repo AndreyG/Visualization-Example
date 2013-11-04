@@ -6,7 +6,7 @@ QT += opengl
 
 OBJECTS_DIR = bin
 
-QMAKE_CXXFLAGS = -std=c++11 -Wall
+QMAKE_CXXFLAGS = -std=c++11 -Wall -g
 
 macx {
     QMAKE_CXXFLAGS += -stdlib=libc++  

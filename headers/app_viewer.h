@@ -43,6 +43,7 @@ private:
     std::vector<segment_type> tri_segms;       // result after triangulation
     std::vector<polygon_type> holes;
     std::vector<std::pair<point_type, geom::algorithms::TRIP_TYPE> > point_marks;
+    std::vector<pair<size_t, size_t> > split_diagonals;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
     bool is_polygon_loaded_successfully = false;

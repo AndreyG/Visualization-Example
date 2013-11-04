@@ -216,28 +216,86 @@ namespace geom {
             return false;
         }
 
-        vector<pair<point_type, TRIP_TYPE> > triangulate_with_holes(
-                const vector<point_type>& polygon, 
+        // it is not used in real triangulation method
+
+        vector<pair<point_type, TRIP_TYPE> > get_points_types(
+                const vector<point_type>& polygon,
                 const vector<vector<point_type> >& holes) {
 
             vector<pair<point_type, TRIP_TYPE> > typesRes;
-            
-            for(size_t i = 0; i < polygon.size(); i++){
+
+            for (size_t i = 0; i < polygon.size(); i++) {
                 typesRes.push_back(
-                        make_pair(polygon[i], getTripType(polygon, i, false)));
+                        make_pair(polygon[i], get_trip_type(polygon, i, false)));
             }
-            
-            for(auto hole: holes)
-            for (size_t i = 0; i < hole.size(); i++) {
-                typesRes.push_back(
-                            make_pair(hole[i], getTripType(hole, i, false)));
-            }
-            
+
+            for (auto hole : holes)
+                for (size_t i = 0; i < hole.size(); i++) {
+                    typesRes.push_back(
+                            make_pair(hole[i], get_trip_type(hole, i, false)));
+                }
+
             return typesRes;
 
         }
 
-        TRIP_TYPE getTripType(const vector<point_type>& polygon, size_t index,
+        vector<pair<size_t, size_t> > get_tri_split(const vector<point_type>& polygon) {
+
+            vector<pair<size_t, size_t > > res;
+
+            vector<size_t> orderByXY;
+            for (size_t i = 0; i < polygon.size(); i++) orderByXY.push_back(i);
+
+            sort(orderByXY.begin(), orderByXY.end(),
+                    [&polygon](size_t i, size_t j) {
+                        return polygon[i] < polygon[j];
+                    });
+
+
+            Status status(polygon);
+            for (size_t i : orderByXY) {
+                TRIP_TYPE type = get_trip_type(polygon, i, false);
+                size_t next = (i + 1) % polygon.size();
+                size_t prev = ((i - 1) + polygon.size()) % polygon.size();
+                if (type == TRIP_START) {
+                    status.add_segment(i, i);
+                    status.add_segment(i, next);
+                    continue;
+                }
+                
+                size_t helper = status.get_segment_helper(i);
+                status.remove_segment_with_end(i);
+                status.update_segment_helper(i);
+
+                if (type == TRIP_REGULAR) {
+                    if (polygon[next] > polygon[prev]) {
+                        status.add_segment(i, next);
+                    } else {
+                        status.add_segment(i, prev);
+                    }
+                    continue;
+                }
+
+                if (type == TRIP_SPLIT) {
+                    status.add_segment(i, i);
+                    status.add_segment(i, next);
+                    res.push_back(make_pair(i, helper));
+                    continue;
+                }
+
+                if (type == TRIP_REGULAR || type == TRIP_END || type == TRIP_MERGE) {
+                    TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
+                    if(helperType == TRIP_MERGE){
+                        res.push_back(make_pair(i, helper));
+                    }
+                }
+            }
+
+            return res;
+
+        }
+
+        TRIP_TYPE get_trip_type(const vector<point_type>& polygon, size_t index,
                 bool isInHole) {
             auto pbefore = polygon[(index > 0) ? index - 1 : polygon.size() - 1];
             auto pafter = polygon[(index < polygon.size() - 1) ? index + 1 : 0];
@@ -268,4 +326,5 @@ namespace geom {
 
     }
 }
+
 

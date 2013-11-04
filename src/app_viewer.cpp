@@ -31,14 +31,19 @@ void app_viewer::draw(drawer_type & drawer) const {
 
     for (auto p : point_marks) {
         drawer::drawTripVertex(drawer, p.first, p.second);
-    }            
-
-    drawer::drawLegend(drawer, get_legend_pnt());
-
+    }
+    
+    drawer.set_color(Qt::darkYellow);
+    for(auto p : split_diagonals){
+        drawer.draw_line(segment_type(polygon[p.first], polygon[p.second]));
+    }
+    
+//    drawer::drawLegend(drawer, get_legend_pnt());
+    
 }
 
 point_type app_viewer::get_legend_pnt() const {
-
+    
     return point_type(
             -get_wnd()->width() / 2 + 10,
             -get_wnd()->height() / 2 + 30
@@ -75,13 +80,13 @@ void app_viewer::print(printer_type & printer) const {
         global_stream2 << " Or press H to start drawing a hole.";
     }
     
-    stream_type& global_stream3 = printer.global_stream(get_legend_pnt());
-    global_stream3 << "LEGEND:";
-    global_stream3 << "         regular";
-    global_stream3 << "         start";
-    global_stream3 << "         split";
-    global_stream3 << "         end";
-    global_stream3 << "         merge";
+//    stream_type& global_stream3 = printer.global_stream(get_legend_pnt());
+//    global_stream3 << "LEGEND:";
+//    global_stream3 << "         regular";
+//    global_stream3 << "         start";
+//    global_stream3 << "         split";
+//    global_stream3 << "         end";
+//    global_stream3 << "         merge";
     
 }
 
@@ -105,7 +110,8 @@ bool app_viewer::on_key(int key) {
             else return on_hole_drawing_stop();
         case Qt::Key_Return:
             if (!is_polygon_loaded_successfully) return false;
-            point_marks = geom::algorithms::triangulate_with_holes(polygon, holes);
+            point_marks = geom::algorithms::get_points_types(polygon, holes);
+            split_diagonals = geom::algorithms::get_tri_split(polygon);
             return true;
             break;
         case Qt::Key_S:

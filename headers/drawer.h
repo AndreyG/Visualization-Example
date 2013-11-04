@@ -49,7 +49,6 @@ namespace drawer {
     }
 
     void drawTripVertex(drawer_type& drawer, const point_type& point, TRIP_TYPE type) {
-        cout << point << type << endl;
         point_type a(point);
         point_type b(point);
         a.x -= 5;
@@ -57,22 +56,17 @@ namespace drawer {
         switch (type) {
             case TRIP_REGULAR:
                 drawer.set_color(Qt::green);
-                cout << "reg";
                 break;
             case TRIP_START:
                 drawer.set_color(Qt::red);
-                cout << "start";
                 break;
             case TRIP_SPLIT:
-                cout << "split";
                 drawer.set_color(Qt::cyan);
                 break;
             case TRIP_END:
                 cout << "end";
-                drawer.set_color(Qt::blue);
                 break;
             case TRIP_MERGE:
-                cout << "merge";
                 drawer.set_color(Qt::darkGreen);
                 break;
         }
@@ -82,7 +76,7 @@ namespace drawer {
     void drawLegend(drawer_type& drawer, const point_type& point) {
 
         // regular start split end merge
-
+        cout << "Draw legend" << endl;
         int offsetset[] = { 80, 78, 60, 57, 55}; // n - 1
 
         TRIP_TYPE types[] = {TRIP_REGULAR, TRIP_START, TRIP_SPLIT,
