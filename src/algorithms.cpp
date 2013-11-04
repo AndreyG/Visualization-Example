@@ -255,6 +255,7 @@ namespace geom {
             Status status(polygon);
             for (size_t i : orderByXY) {
                 TRIP_TYPE type = get_trip_type(polygon, i, false);
+                
                 size_t next = (i + 1) % polygon.size();
                 size_t prev = ((i - 1) + polygon.size()) % polygon.size();
                 if (type == TRIP_START) {
@@ -263,7 +264,13 @@ namespace geom {
                     continue;
                 }
                 
+                
+                
                 size_t helper = status.get_segment_helper(i);
+                
+//                cout << polygon[i] << " " << polygon[helper] << endl;
+                cout << i << " " << helper << endl;
+                
                 status.remove_segment_with_end(i);
                 status.update_segment_helper(i);
 

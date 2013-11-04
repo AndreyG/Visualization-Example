@@ -64,7 +64,6 @@ namespace drawer {
                 drawer.set_color(Qt::cyan);
                 break;
             case TRIP_END:
-                cout << "end";
                 break;
             case TRIP_MERGE:
                 drawer.set_color(Qt::darkGreen);

@@ -57,32 +57,31 @@ namespace geom {
 
         TRIP_TYPE get_trip_type(const vector<point_type>& polygon, size_t index,
                 bool isInHole);
-        
-        static const vector<point_type>* stapolygonp;
-        
+
         class Status {
-            
-            
-            
+
             struct PointComp {
-                
+                const vector<point_type> & polygon;
+
+                PointComp(const vector<point_type>& polygon) : polygon(polygon) {
+                }
+
                 bool operator()(const size_t& a, const size_t& b) {
-                    const vector<point_type>& p = *(stapolygonp);
-                    return p[a].y > p[b].y;
+                    return polygon[a].y > polygon[b].y;
                 }
             };
-            
+
         public:
 
-            Status(const vector<point_type>& polygon) : polygon(polygon) {
-                stapolygonp = &polygon;
+            Status(const vector<point_type>& polygon) : polygon(polygon),
+            segmentRightEndHelper(polygon) {
             }
 
 
             // possible to add start "segment" where from == to
 
             void add_segment(size_t from, size_t to) {
-                segmentRightEndHelper[from] = to;
+                segmentRightEndHelper[to] = from;
             }
 
             void update_segment_helper(size_t to) {
@@ -99,7 +98,7 @@ namespace geom {
 
         private:
             const vector<point_type>& polygon;
-            map<size_t, size_t, PointComp> segmentRightEndHelper;            
+            map<size_t, size_t, PointComp> segmentRightEndHelper;
 
         };
 
