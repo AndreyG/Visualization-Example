@@ -279,7 +279,6 @@ namespace geom {
                 }
 
                 if (type == TRIP_SPLIT) {
-                    status.add_segment(i, i);
                     status.add_segment(i, next);
                     res.push_back(make_pair(i, helper));
                     continue;
