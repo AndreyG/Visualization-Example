@@ -308,7 +308,7 @@ namespace geom {
                 return TRIP_REGULAR;
             }
 
-            if (pme.x < pbefore.x && pme.x < pafter.x) {
+            if (pme.x <= pbefore.x && pme.x < pafter.x) {
                 auto turn = left_turn(pbefore, pme, pafter);
                 if (isInHole) turn *= -1;
                 if (turn > 0) return TRIP_START;
