@@ -81,19 +81,23 @@ namespace geom {
             // possible to add start "segment" where from == to
 
             void add_segment(size_t from, size_t to) {
+                cout << "add (" << to << ", " << from << ") " << endl;
                 segmentRightEndHelper[to] = from;
             }
 
             void update_segment_helper(size_t to) {
+                cout << "update (" << segmentRightEndHelper.upper_bound(to)->first << " " << segmentRightEndHelper.upper_bound(to)->second << ") -> ";
                 segmentRightEndHelper.upper_bound(to)->second = to;
+                cout << "(" << segmentRightEndHelper.upper_bound(to)->first << " " << segmentRightEndHelper.upper_bound(to)->second << ")" << endl;
             }
 
             void remove_segment_with_end(size_t to) {
+                cout << "remove " << to << endl;
                 segmentRightEndHelper.erase(to);
             }
 
             size_t get_segment_helper(size_t to) {
-                return segmentRightEndHelper.upper_bound(to)->second;
+                return segmentRightEndHelper.lower_bound(to)->second;
             }
 
         private:

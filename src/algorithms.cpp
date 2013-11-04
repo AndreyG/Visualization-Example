@@ -259,7 +259,7 @@ namespace geom {
                 size_t next = (i + 1) % polygon.size();
                 size_t prev = ((i - 1) + polygon.size()) % polygon.size();
                 if (type == TRIP_START) {
-                    status.add_segment(i, i);
+                    // status.add_segment(i, i);
                     status.add_segment(i, next);
                     continue;
                 }
@@ -268,19 +268,14 @@ namespace geom {
                 
                 size_t helper = status.get_segment_helper(i);
                 
-//                cout << polygon[i] << " " << polygon[helper] << endl;
-                cout << i << " " << helper << endl;
-                
                 status.remove_segment_with_end(i);
+                cout << "(" << i << ", " << helper << ")" << endl;
+                
                 status.update_segment_helper(i);
 
                 if (type == TRIP_REGULAR) {
-                    if (polygon[next] > polygon[prev]) {
+                    if (polygon[next] > polygon[prev]) 
                         status.add_segment(i, next);
-                    } else {
-                        status.add_segment(i, prev);
-                    }
-                    continue;
                 }
 
                 if (type == TRIP_SPLIT) {
