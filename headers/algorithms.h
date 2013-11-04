@@ -65,9 +65,23 @@ namespace geom {
 
                 PointComp(const vector<point_type>& polygon) : polygon(polygon) {
                 }
+                
+                point_type get_left_end(size_t pi) {
+                    size_t prev = (pi - 1 + polygon.size()) % polygon.size();
+                    size_t next = (pi + 1) % polygon.size();
+                    if(polygon[prev].x < polygon[next].x)
+                        return polygon[prev];
+                    return polygon[next];
+                }
 
                 bool operator()(const size_t& a, const size_t& b) {
-                    return polygon[a].y > polygon[b].y;
+                    point_type pa = get_left_end(a);
+                    point_type pb = polygon[a];
+                    point_type pc = get_left_end(b);
+                    if(pc.y > std::max(pa.y, pb.y)) return false;
+                    if(pc.y < std::min(pa.y, pb.y)) return true;
+                    int turn = left_turn(pa, pb, pc);
+                    return turn == -1;
                 }
             };
 
@@ -76,10 +90,7 @@ namespace geom {
             Status(const vector<point_type>& polygon) : polygon(polygon),
             segmentRightEndHelper(polygon) {
             }
-
-
-            // possible to add start "segment" where from == to
-
+            
             void add_segment(size_t from, size_t to) {
                 cout << "add (" << to << ", " << from << ") " << endl;
                 segmentRightEndHelper[to] = from;
