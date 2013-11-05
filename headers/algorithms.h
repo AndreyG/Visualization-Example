@@ -57,108 +57,107 @@ namespace geom {
 
         TRIP_TYPE get_trip_type(const vector<point_type>& polygon, size_t index,
                 bool isInHole);
+        
+        inline size_t next(const vector<point_type>& polygon, size_t i){
+            return (i + 1) % polygon.size();
+        }
+        
+        inline point_type nextp(const vector<point_type>& polygon, size_t i){
+            return polygon[next(polygon, i)];
+        }
+        
+        inline size_t prev(const vector<point_type>& polygon, size_t i){
+            return (i - 1 + polygon.size()) %  polygon.size();
+        }
+        
+        inline point_type prevp(const vector<point_type>& polygon, size_t i){
+            return polygon[prev(polygon, i)];
+        }
 
         class Status {
 
-            struct PointComp {
-                const vector<point_type> & polygon;
-
-                PointComp(const vector<point_type>& polygon) : polygon(polygon) {
-                }
-                
-                point_type get_left_end(size_t pi) {
-                    size_t prev = (pi - 1 + polygon.size()) % polygon.size();
-                    size_t next = (pi + 1) % polygon.size();
-                    if(polygon[prev].x < polygon[next].x)
-                        return polygon[prev];
-                    return polygon[next];
-                }
-
-                bool operator()(const size_t& a, const size_t& b) {
-                    if(a == b) return false;
-                    point_type pa(0,0);
-                    point_type pb(0,0);
-                    point_type pc(0,0);
-                    point_type pd(0,0);
-                    
-                    if(a < polygon.size()) {
-                        pa = get_left_end(a);
-                        pb = polygon[a];
-                    } else {
-                        pa = polygon[a - polygon.size()];
-                        pb = point_type(pa.x + 1, pa.y);
-                    }
-                    
-                    if(b < polygon.size()) {
-                        pc = get_left_end(b);
-                        pd = polygon[b];
-                    } else {
-                        pc = polygon[b - polygon.size()];
-                        pd = point_type(pc.x + 1, pc.y);
-                    }
-                    
-                    if(pa == pc) {
-                        if(pb.y > pd.y) return true;
-                        return false;
-                    }
-                    
-                    if(pb == pd) {
-                        if(pa.y > pc.y) return true;
-                        return false;
-                    }
-                    
-                    // else vector product
-                    int a1 = pb.x - pa.x;
-                    int b1 = pb.y - pa.y;
-                    
-                    int a2 = pd.x - pc.x;
-                    int b2 = pd.y - pc.y;
-                    
-                    int prod = a1 * b2 - b1 * a2;
-                    
-                    return prod < 0;
-                    
-                }
-                
-            };
-
+          
         public:
 
-            Status(const vector<point_type>& polygon) : polygon(polygon),
-            segmentRightEndHelper(polygon) {
+            Status(const vector<point_type>& polygon) : polygon(polygon) {
             }
             
-            void add_segment(size_t from, size_t to) {
-                // cout << "zero before add " << segmentRightEndHelper[(size_t)0]  << " -- " << to << endl;
-                cout << "add (" << to << ", " << from << ") " << endl;
-                segmentRightEndHelper[to] = from;
-                // cout << "zero before add " << segmentRightEndHelper[(size_t)0]  << " -- " << to << endl;
+            void add_segment(size_t i) {
+                TRIP_TYPE type = get_trip_type(polygon, i, false);
+                if(type == TRIP_START || type == TRIP_SPLIT){
+                    insert(next(polygon, i));
+                }
+                if(type == TRIP_REGULAR){
+                    if(polygon[i].x < nextp(polygon, i).x)
+                        insert(next(polygon, i));
+                }
+                
+                
             }
             
-            void update_segment_helper(size_t to) {
-                auto it = segmentRightEndHelper.upper_bound(to);
-                cout << "update (" << it->first << ", " << it->second << ") -> ";
-                it->second = to;
-                cout << "(" << it->first << ", " << it->second << ")" << endl;
+            void insert(size_t i){
+                point_type leftEnd = prevp(polygon, i);
+                auto it = segments.begin();
+                while(it != segments.end()){
+                    auto pa = prevp(polygon, *it);
+                    auto pb = polygon[*it];
+                    int turn = left_turn(segment_type(pa, pb), leftEnd);
+                    if(turn < 0) break;
+                    it++;
+                }
+                segments.insert(it, i);
+                helper[i] = prev(polygon, i);
             }
+            
+            void update_segment_helper(size_t i) {
+                TRIP_TYPE type = get_trip_type(polygon, i, false);
+                if(type == TRIP_REGULAR && prevp(polygon, i).x <= polygon[i].x)
+                    return;
+                if(type == TRIP_START)
+                    return;
+                if(type == TRIP_END)
+                    return;
+                
+                size_t lastPrev = polygon.size();
+                point_type pnt = polygon[i];
+                for(auto seg : segments) {
+                    auto pa = prevp(polygon, seg);
+                    auto pb = polygon[seg];
+                    int turn = left_turn(segment_type(pa, pb), pnt);
+                    if(turn > 1) lastPrev = seg;
+                    else break;
+                }
+                if(lastPrev == polygon.size()){
+                    cout << "NOT FOUND LOWER SEGMENT FOR " << i << " !" << endl;
+                    return;
+                }
+                helper[lastPrev] = i;
+            }
+            
 
             void remove_segment_with_end(size_t to) {
-                cout << "remove " << to << endl;
-                segmentRightEndHelper.erase(to);
+                auto it = find(segments.begin(), segments.end(), to);
+                if(it == segments.end()) {
+                    cout << "NOT FOUND SEGMENT END " << to << " !" << endl;
+                    return;
+                }
+                segments.erase(it);
             }
 
             size_t get_segment_helper(size_t to) {
-                if(segmentRightEndHelper.find(to) != segmentRightEndHelper.end()){
-                    return segmentRightEndHelper[to];
+                auto it = helper.find(to);
+                if(it == helper.end()) {
+                    cout << "NOT FOUND HELPER FOR " << to << " !" << endl;
+                    return 0;
                 }
-                // compare as a point, comparator know about it
-                return segmentRightEndHelper.lower_bound(to + polygon.size())->second;
+                return helper[to];
             }
                         
 
         private:
             const vector<point_type>& polygon;
-            map<size_t, size_t, PointComp> segmentRightEndHelper;
+            map<size_t, size_t> helper;
+            vector<size_t> segments;
 
         };
 

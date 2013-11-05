@@ -248,7 +248,9 @@ namespace geom {
 
             sort(orderByXY.begin(), orderByXY.end(),
                     [&polygon](size_t i, size_t j) {
-                        return polygon[i] < polygon[j];
+                        if(polygon[i].x == polygon[j].x)
+                            return polygon[i].y > polygon[j].y;
+                        return polygon[i].x < polygon[j].x;
                     });
 
 
@@ -257,29 +259,22 @@ namespace geom {
                 
                 TRIP_TYPE type = get_trip_type(polygon, i, false);
                 
-                size_t next = (i + 1) % polygon.size();
-                size_t prev = ((i - 1) + polygon.size()) % polygon.size();
-                if (type == TRIP_START) {
-                    status.add_segment(i, next);
+                if (type == TRIP_START){ 
+                    status.add_segment(i); 
                     continue;
                 }
                 
-
                 size_t helper = status.get_segment_helper(i);
-                cout << "(" << i << ", " << helper << ")" << endl;
                 status.remove_segment_with_end(i);
                 
                 if(type != TRIP_END)
                     status.update_segment_helper(i);
                 
-                if (type == TRIP_REGULAR) {
-                    if (polygon[next] > polygon[prev]) 
-                        status.add_segment(i, next);
-                }
+                status.add_segment(i);
+                
 
                 if (type == TRIP_SPLIT) {
-                    status.add_segment(i, prev);
-                    status.add_segment(i, next);
+                    status.add_segment(i);
                     res.push_back(make_pair(i, helper));
                     continue;
                 }
