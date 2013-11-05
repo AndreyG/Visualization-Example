@@ -75,14 +75,51 @@ namespace geom {
                 }
 
                 bool operator()(const size_t& a, const size_t& b) {
-                    point_type pa = get_left_end(a);
-                    point_type pb = polygon[a];
-                    point_type pc = get_left_end(b);
-                    if(pc.y > std::max(pa.y, pb.y)) return false;
-                    if(pc.y < std::min(pa.y, pb.y)) return true;
-                    int turn = left_turn(pa, pb, pc);
-                    return turn == -1;
+                    if(a == b) return false;
+                    point_type pa(0,0);
+                    point_type pb(0,0);
+                    point_type pc(0,0);
+                    point_type pd(0,0);
+                    
+                    if(a < polygon.size()) {
+                        pa = get_left_end(a);
+                        pb = polygon[a];
+                    } else {
+                        pa = polygon[a - polygon.size()];
+                        pb = point_type(pa.x + 1, pa.y);
+                    }
+                    
+                    if(b < polygon.size()) {
+                        pc = get_left_end(b);
+                        pd = polygon[b];
+                    } else {
+                        pc = polygon[b - polygon.size()];
+                        pd = point_type(pc.x + 1, pc.y);
+                    }
+                    
+                    if(pa == pc) {
+                        if(pb.y > pd.y) return true;
+                        return false;
+                    }
+                    
+                    if(pb == pd) {
+                        if(pa.y > pc.y) return true;
+                        return false;
+                    }
+                    
+                    // else vector product
+                    int a1 = pb.x - pa.x;
+                    int b1 = pb.y - pa.y;
+                    
+                    int a2 = pd.x - pc.x;
+                    int b2 = pd.y - pc.y;
+                    
+                    int prod = a1 * b2 - b1 * a2;
+                    
+                    return prod < 0;
+                    
                 }
+                
             };
 
         public:
@@ -92,14 +129,17 @@ namespace geom {
             }
             
             void add_segment(size_t from, size_t to) {
+                // cout << "zero before add " << segmentRightEndHelper[(size_t)0]  << " -- " << to << endl;
                 cout << "add (" << to << ", " << from << ") " << endl;
                 segmentRightEndHelper[to] = from;
+                // cout << "zero before add " << segmentRightEndHelper[(size_t)0]  << " -- " << to << endl;
             }
-
+            
             void update_segment_helper(size_t to) {
-                cout << "update (" << segmentRightEndHelper.upper_bound(to)->first << " " << segmentRightEndHelper.upper_bound(to)->second << ") -> ";
-                segmentRightEndHelper.upper_bound(to)->second = to;
-                cout << "(" << segmentRightEndHelper.upper_bound(to)->first << " " << segmentRightEndHelper.upper_bound(to)->second << ")" << endl;
+                auto it = segmentRightEndHelper.upper_bound(to);
+                cout << "update (" << it->first << ", " << it->second << ") -> ";
+                it->second = to;
+                cout << "(" << it->first << ", " << it->second << ")" << endl;
             }
 
             void remove_segment_with_end(size_t to) {
@@ -108,8 +148,13 @@ namespace geom {
             }
 
             size_t get_segment_helper(size_t to) {
-                return segmentRightEndHelper.lower_bound(to)->second;
+                if(segmentRightEndHelper.find(to) != segmentRightEndHelper.end()){
+                    return segmentRightEndHelper[to];
+                }
+                // compare as a point, comparator know about it
+                return segmentRightEndHelper.lower_bound(to + polygon.size())->second;
             }
+                        
 
         private:
             const vector<point_type>& polygon;
@@ -119,6 +164,5 @@ namespace geom {
 
 
     }
-
 }
 

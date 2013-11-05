@@ -254,31 +254,31 @@ namespace geom {
 
             Status status(polygon);
             for (size_t i : orderByXY) {
+                
                 TRIP_TYPE type = get_trip_type(polygon, i, false);
                 
                 size_t next = (i + 1) % polygon.size();
                 size_t prev = ((i - 1) + polygon.size()) % polygon.size();
                 if (type == TRIP_START) {
-                    // status.add_segment(i, i);
                     status.add_segment(i, next);
                     continue;
                 }
                 
-                
-                
-                size_t helper = status.get_segment_helper(i);
-                
-                status.remove_segment_with_end(i);
-                cout << "(" << i << ", " << helper << ")" << endl;
-                
-                status.update_segment_helper(i);
 
+                size_t helper = status.get_segment_helper(i);
+                cout << "(" << i << ", " << helper << ")" << endl;
+                status.remove_segment_with_end(i);
+                
+                if(type != TRIP_END)
+                    status.update_segment_helper(i);
+                
                 if (type == TRIP_REGULAR) {
                     if (polygon[next] > polygon[prev]) 
                         status.add_segment(i, next);
                 }
 
                 if (type == TRIP_SPLIT) {
+                    status.add_segment(i, prev);
                     status.add_segment(i, next);
                     res.push_back(make_pair(i, helper));
                     continue;
@@ -314,7 +314,7 @@ namespace geom {
                 else return TRIP_SPLIT;
             }
 
-            if (pme.x > pbefore.x && pme.x > pafter.x) {
+            if (pme.x > pbefore.x && pme.x >= pafter.x) {
                 auto turn = left_turn(pbefore, pme, pafter);
                 if (isInHole) turn *= -1;
                 if (turn > 0) return TRIP_END;
