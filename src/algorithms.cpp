@@ -248,9 +248,7 @@ namespace geom {
 
             sort(orderByXY.begin(), orderByXY.end(),
                     [&polygon](size_t i, size_t j) {
-                        if(polygon[i].x == polygon[j].x)
-                            return polygon[i].y > polygon[j].y;
-                        return polygon[i].x < polygon[j].x;
+                        return polygon[i] < polygon[j];
                     });
 
 
@@ -258,21 +256,34 @@ namespace geom {
             for (size_t i : orderByXY) {
                 
                 auto type = get_trip_type(polygon, i, false);
-                if(type == TRIP_START){
+                if(type == TRIP_START) {
                     status.add(i);
                     continue;
                 }
                 
+                bool foundGoodHelper = false;
                 size_t helper = status.helper(i);
-                TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
-                if(helperType == TRIP_MERGE) {
-                    res.push_back(make_pair(helper, i));
+                if(helper != (size_t) (-1) && helper != prev(polygon, i)){
+                    foundGoodHelper = true;
                 }
-                if(type == TRIP_SPLIT) {
-                    res.push_back(make_pair(helper, i));
+                if(!foundGoodHelper){
+                    size_t lowerSegmentI = status.find_lower_segment(i);
+                    if(lowerSegmentI != (size_t)(-1)) {
+                        helper = status.helper(lowerSegmentI);
+                        foundGoodHelper = true;
+                    }
                 }
-                
-                status.remove(i);
+                if(helper != (size_t)(-1)){
+                    TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
+                    cout << "(" << i << ", " << helper << ") " << endl;
+                    if(helperType == TRIP_MERGE) {
+                        res.push_back(make_pair(helper, i));
+                    }
+                    if(type == TRIP_SPLIT) {
+                        res.push_back(make_pair(helper, i));
+                    }
+                }
+                status.remove(i); 
                 status.update(i);
                 status.add(i);
                 

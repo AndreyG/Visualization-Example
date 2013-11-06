@@ -108,6 +108,13 @@ namespace geom {
                 if(type == TRIP_END)
                     return;
                 
+                auto left = find_lower_segment(i);
+                if(left == (size_t)(-1)) return;
+                cout << "helper[" << left << "] " << helper_[left] << "->" << i << endl;
+                helper_[left] = i;
+            }
+            
+            size_t find_lower_segment(size_t i) {
                 cout << "search: " << i << ": ";
                 auto lastGood = segments.end();
                 for(auto it = segments.begin(); it != segments.end(); it++){
@@ -121,13 +128,12 @@ namespace geom {
                 }
                 cout << " -- res: " << *lastGood << endl;
                 
-                if(lastGood == segments.end()){
+                if(lastGood == segments.end()) {
                     cout << "NOT FOUND LOWER SEGMENT FOR " << i << "!" << endl;
-                    return;
+                    return (size_t)-1;
                 }
                 
-                helper_[i] = helper_[*lastGood];
-                helper_[*lastGood] = i;                
+                return *lastGood;
             }
             
             void remove(size_t i) {
@@ -149,16 +155,13 @@ namespace geom {
 
             size_t helper(size_t i) {
                 auto it = helper_.find(i);
-                if(it == helper_.end()){
-                    update(i);
+                if(it != helper_.end()) {
+                    return helper_[i];
                 }
-                it = helper_.find(i);
-                if(it == helper_.end()) {
-                    cout << "NOT FOUND HELPER FOR " << i << " !" << endl;
-                    return 0;
-                }
-                return helper_[i];
+                return (size_t)(-1);
             }
+            
+            
                         
 
         private:
