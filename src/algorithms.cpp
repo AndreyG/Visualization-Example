@@ -273,7 +273,7 @@ namespace geom {
                         foundGoodHelper = true;
                     }
                 }
-                if(helper != (size_t)(-1)){
+                if(foundGoodHelper){
                     TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
                     cout << "(" << i << ", " << helper << ") " << endl;
                     if(helperType == TRIP_MERGE) {
