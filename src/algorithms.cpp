@@ -254,7 +254,7 @@ namespace geom {
 
             Status status(polygon);
             for (size_t i : orderByXY) {
-                
+
                 auto type = get_trip_type(polygon, i, false);
                 if(type == TRIP_START) {
                     status.add(i);
@@ -308,7 +308,10 @@ namespace geom {
                 auto turn = left_turn(pbefore, pme, pafter);
                 if (isInHole) turn *= -1;
                 if (turn > 0) return TRIP_START;
-                else return TRIP_SPLIT;
+                
+            }
+            if (pme.x < pbefore.x && pme.x < pafter.x) {
+                return TRIP_SPLIT;
             }
 
             if (pme.x > pbefore.x && pme.x >= pafter.x) {
