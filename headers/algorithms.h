@@ -108,25 +108,26 @@ namespace geom {
                 if(type == TRIP_END)
                     return;
                 
-                size_t lastPrev = polygon.size();
-                point_type pnt = polygon[i];
-                cout << "search for " << i << ": ";
-                cout << "size: " << segments.size() << ": ";
-                for(auto seg : segments) {
-                    cout << seg << " ";
-                    auto pa = prevp(polygon, seg);
-                    auto pb = polygon[seg];
-                    int turn = left_turn(segment_type(pa, pb), pnt);
-                    if(turn > 0) lastPrev = seg;
+                cout << "search: " << i << ": ";
+                auto lastGood = segments.end();
+                for(auto it = segments.begin(); it != segments.end(); it++){
+                    cout << prev(polygon, *it) << " " << *it << " ";
+                    point_type pa = prevp(polygon, *it);
+                    point_type pb = polygon[*it];
+                    int turn = left_turn(segment_type(pa, pb), polygon[i]);
+                    cout << turn << "::";
+                    if(turn > 0) lastGood = it;
                     else break;
                 }
-                cout << endl;
-                if(lastPrev == polygon.size()){
-                    cout << "NOT FOUND LOWER SEGMENT FOR " << i << " !" << endl;
+                cout << " -- res: " << *lastGood << endl;
+                
+                if(lastGood == segments.end()){
+                    cout << "NOT FOUND LOWER SEGMENT FOR " << i << "!" << endl;
                     return;
                 }
-                helper_[i] = helper_[lastPrev];
-                helper_[lastPrev] = i;
+                
+                helper_[i] = helper_[*lastGood];
+                helper_[*lastGood] = i;                
             }
             
             void remove(size_t i) {
@@ -151,6 +152,7 @@ namespace geom {
                 if(it == helper_.end()){
                     update(i);
                 }
+                it = helper_.find(i);
                 if(it == helper_.end()) {
                     cout << "NOT FOUND HELPER FOR " << i << " !" << endl;
                     return 0;
