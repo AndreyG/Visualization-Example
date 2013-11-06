@@ -257,34 +257,25 @@ namespace geom {
             Status status(polygon);
             for (size_t i : orderByXY) {
                 
-                TRIP_TYPE type = get_trip_type(polygon, i, false);
-                
-                if (type == TRIP_START){ 
-                    status.add_segment(i); 
+                auto type = get_trip_type(polygon, i, false);
+                if(type == TRIP_START){
+                    status.add(i);
                     continue;
                 }
                 
-                size_t helper = status.get_segment_helper(i);
-                status.remove_segment_with_end(i);
-                
-                if(type != TRIP_END)
-                    status.update_segment_helper(i);
-                
-                status.add_segment(i);
-                
-
-                if (type == TRIP_SPLIT) {
-                    status.add_segment(i);
-                    res.push_back(make_pair(i, helper));
-                    continue;
+                size_t helper = status.helper(i);
+                TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
+                if(helperType == TRIP_MERGE) {
+                    res.push_back(make_pair(helper, i));
                 }
-
-                if (type == TRIP_REGULAR || type == TRIP_END || type == TRIP_MERGE) {
-                    TRIP_TYPE helperType = get_trip_type(polygon, helper, false);
-                    if(helperType == TRIP_MERGE){
-                        res.push_back(make_pair(i, helper));
-                    }
+                if(type == TRIP_SPLIT) {
+                    res.push_back(make_pair(helper, i));
                 }
+                
+                status.remove(i);
+                status.update(i);
+                status.add(i);
+                
             }
 
             return res;

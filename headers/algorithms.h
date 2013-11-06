@@ -67,12 +67,19 @@ namespace geom {
         }
         
         inline size_t prev(const vector<point_type>& polygon, size_t i){
-            return (i - 1 + polygon.size()) %  polygon.size();
+            return ((i + polygon.size()) - 1) %  polygon.size();
         }
         
         inline point_type prevp(const vector<point_type>& polygon, size_t i){
             return polygon[prev(polygon, i)];
         }
+        
+        inline bool is_lower_regular(const vector<point_type>& polygon, size_t i){
+            TRIP_TYPE type = get_trip_type(polygon, i, false);
+            if(type != TRIP_REGULAR) return false;
+            return nextp(polygon, i).x > polygon[i].x;
+        }
+        
 
         class Status {
 
@@ -82,20 +89,83 @@ namespace geom {
             Status(const vector<point_type>& polygon) : polygon(polygon) {
             }
             
-            void add_segment(size_t i) {
+            void add(size_t i) {
                 TRIP_TYPE type = get_trip_type(polygon, i, false);
                 if(type == TRIP_START || type == TRIP_SPLIT){
                     insert(next(polygon, i));
                 }
-                if(type == TRIP_REGULAR){
-                    if(polygon[i].x < nextp(polygon, i).x)
-                        insert(next(polygon, i));
+                if(type == TRIP_REGULAR && is_lower_regular(polygon, i)) {
+                    insert(next(polygon, i));
                 }
-                
-                
             }
             
-            void insert(size_t i){
+            void update(size_t i) {
+                TRIP_TYPE type = get_trip_type(polygon, i, false);
+                if(type == TRIP_REGULAR && is_lower_regular(polygon, i))
+                    return;
+                if(type == TRIP_START)
+                    return;
+                if(type == TRIP_END)
+                    return;
+                
+                size_t lastPrev = polygon.size();
+                point_type pnt = polygon[i];
+                cout << "search for " << i << ": ";
+                cout << "size: " << segments.size() << ": ";
+                for(auto seg : segments) {
+                    cout << seg << " ";
+                    auto pa = prevp(polygon, seg);
+                    auto pb = polygon[seg];
+                    int turn = left_turn(segment_type(pa, pb), pnt);
+                    if(turn > 0) lastPrev = seg;
+                    else break;
+                }
+                cout << endl;
+                if(lastPrev == polygon.size()){
+                    cout << "NOT FOUND LOWER SEGMENT FOR " << i << " !" << endl;
+                    return;
+                }
+                helper_[i] = helper_[lastPrev];
+                helper_[lastPrev] = i;
+            }
+            
+            void remove(size_t i) {
+                cout << "remove " << i << endl;
+                
+                TRIP_TYPE type = get_trip_type(polygon, i, false);
+                if(type == TRIP_SPLIT || type == TRIP_START)
+                    return;
+                if(type == TRIP_REGULAR && !is_lower_regular(polygon, i))
+                    return;
+                
+                auto it = find(segments.begin(), segments.end(), i);
+                if(it == segments.end()) {
+                    cout << "NOT FOUND SEGMENT END " << i << " !" << endl;
+                    return;
+                }
+                segments.erase(it);
+            }
+
+            size_t helper(size_t i) {
+                auto it = helper_.find(i);
+                if(it == helper_.end()){
+                    update(i);
+                }
+                if(it == helper_.end()) {
+                    cout << "NOT FOUND HELPER FOR " << i << " !" << endl;
+                    return 0;
+                }
+                return helper_[i];
+            }
+                        
+
+        private:
+            const vector<point_type>& polygon;
+            map<size_t, size_t> helper_;
+            vector<size_t> segments;
+            
+            void insert(size_t i) {
+                cout << "insert " << i;
                 point_type leftEnd = prevp(polygon, i);
                 auto it = segments.begin();
                 while(it != segments.end()){
@@ -106,58 +176,9 @@ namespace geom {
                     it++;
                 }
                 segments.insert(it, i);
-                helper[i] = prev(polygon, i);
+                cout << " Now size " << segments.size() << endl;
+                helper_[i] = prev(polygon, i);
             }
-            
-            void update_segment_helper(size_t i) {
-                TRIP_TYPE type = get_trip_type(polygon, i, false);
-                if(type == TRIP_REGULAR && prevp(polygon, i).x <= polygon[i].x)
-                    return;
-                if(type == TRIP_START)
-                    return;
-                if(type == TRIP_END)
-                    return;
-                
-                size_t lastPrev = polygon.size();
-                point_type pnt = polygon[i];
-                for(auto seg : segments) {
-                    auto pa = prevp(polygon, seg);
-                    auto pb = polygon[seg];
-                    int turn = left_turn(segment_type(pa, pb), pnt);
-                    if(turn > 1) lastPrev = seg;
-                    else break;
-                }
-                if(lastPrev == polygon.size()){
-                    cout << "NOT FOUND LOWER SEGMENT FOR " << i << " !" << endl;
-                    return;
-                }
-                helper[lastPrev] = i;
-            }
-            
-
-            void remove_segment_with_end(size_t to) {
-                auto it = find(segments.begin(), segments.end(), to);
-                if(it == segments.end()) {
-                    cout << "NOT FOUND SEGMENT END " << to << " !" << endl;
-                    return;
-                }
-                segments.erase(it);
-            }
-
-            size_t get_segment_helper(size_t to) {
-                auto it = helper.find(to);
-                if(it == helper.end()) {
-                    cout << "NOT FOUND HELPER FOR " << to << " !" << endl;
-                    return 0;
-                }
-                return helper[to];
-            }
-                        
-
-        private:
-            const vector<point_type>& polygon;
-            map<size_t, size_t> helper;
-            vector<size_t> segments;
 
         };
 
