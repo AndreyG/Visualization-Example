@@ -4,7 +4,7 @@
 #include "geom/primitives/segment.h"
 #include "triangulation_types.h"
 #include "algorithms_geom.h"
-#include <algorithms>
+#include <algorithm>
 
 #include <vector>
 #include <iostream>
@@ -14,6 +14,7 @@ using namespace geom::structures;
 using namespace geom::algorithms;
 
 class Status {
+	segments;
 
 public:
 

@@ -5,6 +5,8 @@
 #include "geom/primitives/segment.h"
 
 #include <vector>
+#include <iostream>
+using namespace std;
 
 using namespace geom::structures;
 
@@ -16,37 +18,38 @@ enum TRIP_TYPE {
 
 struct PolygonVertex;
 struct TriPolygon {
-	std::vector<PolygonVertex> verteces;
+	std::vector<PolygonVertex> vertexes;
 	bool isHole = false;
-	
-	TriPolygon(const polygon_type& pt){
-		for(auto p: pt){
+
+	TriPolygon(const polygon_type& pt, bool isHole_) :
+			isHole(isHole_) {
+		for (auto p : pt) {
 			add_vertex(p);
 		}
 	}
-	
+
 	void add_vertex(const point_type& point);
 	inline size_t size() const {
-		return verteces.size();
+		return vertexes.size();
 	}
 	const PolygonVertex& operator[](size_t i) const {
-		return verteces.at(i);
+		return vertexes.at(i);
 	}
 	PolygonVertex& operator[](size_t i) {
-		return verteces.at(i);
+		return vertexes.at(i);
 	}
 };
 struct PolygonVertex {
 
-	PolygonVertex(const TriPolygon& polygon, size_t index, point_type point) :
+	const TriPolygon& polygon;
+	const size_t index;
+	point_type point;
+	TRIP_TYPE type;
+
+	PolygonVertex(const TriPolygon& polygon, const size_t index,
+			const point_type& point) :
 			polygon(polygon), index(index), point(point), type(TRIP_REGULAR) {
 	}
-
-	const size_t index;
-	TRIP_TYPE type;
-	point_type point;
-
-	const TriPolygon& polygon;
 
 	inline const PolygonVertex& next() const {
 		return polygon[(index + 1) % polygon.size()];

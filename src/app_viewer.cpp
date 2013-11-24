@@ -7,9 +7,10 @@
 
 void app_viewer::draw(drawer_type & drawer) const {
 	drawer.set_color(Qt::blue);
+	
 	for (point_type const & pt : cur_drawing_pts)
 		drawer.draw_point(pt, 3);
-
+        
 	if (is_hole_draw_state)
 		drawer.set_color(Qt::blue);
 	else

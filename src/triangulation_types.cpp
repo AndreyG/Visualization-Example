@@ -1,7 +1,7 @@
 #include "triangulation_types.h" 
 
 void TriPolygon::add_vertex(const point_type& point) {
-	verteces.push_back(PolygonVertex(*this, verteces.size(), point));
+	vertexes.push_back(PolygonVertex(*this, vertexes.size(), point));
 }
 
 std::ostream & operator <<(std::ostream & out, PolygonVertex const & pv) {
