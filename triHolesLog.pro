@@ -26,11 +26,13 @@ INCLUDEPATH += src \
                headers \
 
 HEADERS += headers/stdafx.h \
-           headers/algorithms.h \
+           headers/algorithms_geom.h \
            headers/app_viewer.h \
+           headers/polygon_triangulator.h \
 
 SOURCES += src/main.cpp \
-           src/algorithms.cpp \ 
+           src/algorithms_geom.cpp \ 
            src/app_viewer.cpp \
+           src/polygon_triangulator.cpp \
 
 LIBS += -Lvisualization -lvisualization

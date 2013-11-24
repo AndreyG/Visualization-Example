@@ -5,3 +5,5 @@ nbproject/*
 Makefile
 triHolesLog
 
+/Default
+/bin

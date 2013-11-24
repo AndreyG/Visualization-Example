@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "app_viewer.h"
 
 int main(int argc, char ** argv) {

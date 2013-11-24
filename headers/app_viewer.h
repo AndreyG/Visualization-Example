@@ -3,8 +3,9 @@
 #include "visualization/viewer_adapter.h"
 #include "visualization/draw_util.h"
 #include "io/point.h"
+#include "polygon_triangulator.h"
 
-#include "algorithms.h"
+#include "algorithms_geom.h"
 #include <iostream>
 
 
@@ -35,14 +36,12 @@ struct app_viewer : viewer_adapter {
     bool save_state();
     bool load_state();
     
-    typedef std::vector<point_type> polygon_type;
-    
 private:
     polygon_type polygon;
     std::vector<point_type> cur_drawing_pts;   // polygon
     std::vector<segment_type> tri_segms;       // result after triangulation
     std::vector<polygon_type> holes;
-    std::vector<std::pair<point_type, geom::algorithms::TRIP_TYPE> > point_marks;
+    std::vector<std::pair<point_type, PolygonTriangulator::TRIP_TYPE> > point_marks;
     std::vector<pair<size_t, size_t> > split_diagonals;
     std::string error_str = "";
     bool is_polygon_draw_state = false;
