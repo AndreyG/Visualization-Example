@@ -13,12 +13,6 @@ using namespace std;
 namespace geom {
 namespace algorithms {
 
-void triangulate(const polygon_type& polygon, const vector<polygon_type>& holes,
-		vector<segment_type>& res) {
-	PolygonTriangulator tr(polygon, holes);
-	tr.triangulate();
-}
-
 int left_turn(point_type a, point_type b, point_type c) {
 	int det = a.x * (b.y - c.y) - a.y * (b.x - c.x) + (b.x * c.y - b.y * c.x);
 	if (det > 0)
@@ -157,12 +151,9 @@ bool is_polygons_intersected(const polygon_type& polygonA,
 
 bool is_polygons_intersected(const vector<polygon_type>& polygons,
 		const vector<point_type>& polygon) {
-	for(int i = 0; i < polygons.size(); i++){
-		auto p = polygons[i];
-		if (is_polygons_intersected(p, polygon)){
-			cout << "found intersection with: " << i << endl;
+	for(auto p: polygons){
+		if (is_polygons_intersected(p, polygon))
 			return true;
-		}
 	}
 	return false;
 }

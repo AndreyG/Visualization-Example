@@ -12,16 +12,10 @@ using namespace geom::structures;
 
 typedef std::vector<point_type> polygon_type;
 
-
 namespace geom {
 namespace algorithms {
 
 using namespace geom::structures;
-
-
-
-void triangulate(const polygon_type& polygon, const vector<polygon_type>& holes,
-		vector<segment_type>& res);
 
 int left_turn(point_type a, point_type b, point_type c);
 

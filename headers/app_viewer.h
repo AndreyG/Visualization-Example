@@ -39,10 +39,10 @@ struct app_viewer : viewer_adapter {
 private:
     polygon_type polygon;
     std::vector<point_type> cur_drawing_pts;   // polygon
-    std::vector<segment_type> tri_segms;       // result after triangulation
     std::vector<polygon_type> holes;
-    std::vector<std::pair<point_type, PolygonTriangulator::TRIP_TYPE> > point_marks;
-    std::vector<pair<size_t, size_t> > split_diagonals;
+    std::vector<std::pair<point_type, TRIP_TYPE> > point_types;
+    std::vector<segment_type> split_segments;
+    std::vector<segment_type> triangulation_segments;       // result after triangulation
     std::string error_str = "";
     bool is_polygon_draw_state = false;
     bool is_polygon_loaded_successfully = false;

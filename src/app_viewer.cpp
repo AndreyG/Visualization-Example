@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "drawer.h"
 #include "algorithms_geom.h"
+#include "polygon_triangulator.h"
 
 void app_viewer::draw(drawer_type & drawer) const {
 	drawer.set_color(Qt::blue);
@@ -30,12 +31,12 @@ void app_viewer::draw(drawer_type & drawer) const {
 		drawer.draw_line(sg);
 	}
 
-	for (auto p : point_marks) {
+	for (auto p : point_types) {
 		drawer::drawTripVertex(drawer, p.first, p.second);
 	}
 
 	drawer.set_color(Qt::darkYellow);
-	for (auto p : split_diagonals) {
+	for (auto p : split_segments) {
 		drawer.draw_line(segment_type(polygon[p.first], polygon[p.second]));
 	}
 
@@ -234,9 +235,13 @@ bool app_viewer::on_polygon_drawing_stop() {
 bool app_viewer::on_triangulate() {
 	if (!is_polygon_loaded_successfully)
 		return false;
-	//            point_marks = geom::algorithms::get_points_types(polygon, holes);
-	//            split_diagonals = geom::algorithms::get_tri_split(polygon);
-	geom::algorithms::triangulate(polygon, holes, tri_segms);
+	PolygonTriangulator pt(polygon, holes);
+//	point_types = geom::algorithms::get_points_types(polygon, holes);
+//	            split_segments = geom::algorithms::get_tri_split(polygon);
+	
+	
+//	geom::algorithms::triangulate(, tri_segms);
+	
 	return true;
 }
 
@@ -245,7 +250,7 @@ void app_viewer::restore_init_state() {
 	is_polygon_draw_state = false;
 	is_polygon_loaded_successfully = false;
 	is_hole_draw_state = false;
-	point_marks.clear();
+	point_types.clear();
 	cur_drawing_pts.clear();
 	polygon.clear();
 	holes.clear();

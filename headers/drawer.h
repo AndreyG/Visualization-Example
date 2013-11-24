@@ -45,26 +45,26 @@ void drawPolygon(drawer_type& drawer, const std::vector<point_type>& polygon,
 }
 
 void drawTripVertex(drawer_type& drawer, const point_type& point,
-		PolygonTriangulator::TRIP_TYPE type) {
+		TRIP_TYPE type) {
 
 	point_type a(point);
 	point_type b(point);
 	a.x -= 5;
 	b.x += 5;
 	switch (type) {
-	case PolygonTriangulator::TRIP_REGULAR:
+	case TRIP_REGULAR:
 		drawer.set_color(Qt::green);
 		break;
-	case PolygonTriangulator::TRIP_START:
+	case TRIP_START:
 		drawer.set_color(Qt::red);
 		break;
-	case PolygonTriangulator::TRIP_SPLIT:
+	case TRIP_SPLIT:
 		drawer.set_color(Qt::cyan);
 		break;
-	case PolygonTriangulator::TRIP_END:
+	case TRIP_END:
 		drawer.set_color(Qt::blue);
 		break;
-	case PolygonTriangulator::TRIP_MERGE:
+	case TRIP_MERGE:
 		drawer.set_color(Qt::darkGreen);
 		break;
 	}
@@ -77,9 +77,8 @@ void drawLegend(drawer_type& drawer, const point_type& point) {
 	cout << "Draw legend" << endl;
 	int offsetset[] = { 80, 78, 60, 57, 55 }; // n - 1
 
-	PolygonTriangulator::TRIP_TYPE types[] = { PolygonTriangulator::TRIP_REGULAR,
-			PolygonTriangulator::TRIP_START, PolygonTriangulator::TRIP_SPLIT,
-			PolygonTriangulator::TRIP_END, PolygonTriangulator::TRIP_MERGE };
+	TRIP_TYPE types[] = { TRIP_REGULAR, TRIP_START, TRIP_SPLIT, TRIP_END,
+			TRIP_MERGE };
 	point_type curPoint = point;
 	for (int i = 0; i < 5; i++) {
 		curPoint = point_type(curPoint.x + offsetset[i], point.y + 3);
