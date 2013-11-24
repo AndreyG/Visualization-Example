@@ -239,9 +239,7 @@ bool app_viewer::on_triangulate() {
 	PolygonTriangulator pt(polygon, holes);
 	point_types = pt.get_points_types();
 	split_segments = pt.get_split_segments();
-	
-	
-//	geom::algorithms::triangulate(, tri_segms);
+	triangulation_segments = pt.get_triangulation_segments();
 	
 	return true;
 }

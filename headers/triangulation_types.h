@@ -8,6 +8,8 @@
 
 using namespace geom::structures;
 
+typedef std::vector<point_type> polygon_type;
+
 enum TRIP_TYPE {
 	TRIP_SPLIT, TRIP_MERGE, TRIP_START, TRIP_END, TRIP_REGULAR
 };
@@ -16,6 +18,13 @@ struct PolygonVertex;
 struct TriPolygon {
 	std::vector<PolygonVertex> verteces;
 	bool isHole = false;
+	
+	TriPolygon(const polygon_type& pt){
+		for(auto p: pt){
+			add_vertex(p);
+		}
+	}
+	
 	void add_vertex(const point_type& point);
 	inline size_t size() const {
 		return verteces.size();
