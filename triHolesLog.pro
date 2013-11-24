@@ -29,10 +29,13 @@ HEADERS += headers/stdafx.h \
            headers/algorithms_geom.h \
            headers/app_viewer.h \
            headers/polygon_triangulator.h \
+           headers/triangulation_types.h \
+           headers/drawer.h \
 
 SOURCES += src/main.cpp \
            src/algorithms_geom.cpp \ 
            src/app_viewer.cpp \
            src/polygon_triangulator.cpp \
+           src/triangulation_types.cpp \
 
 LIBS += -Lvisualization -lvisualization

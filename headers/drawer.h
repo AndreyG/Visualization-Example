@@ -2,7 +2,7 @@
 #include "geom/primitives/segment.h"
 #include "geom/primitives/vector.h"
 #include "visualization/viewer.h"
-#include "polygon_triangulator.h"
+#include "triangulation_types.h"
 
 #include "math.h"
 

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "drawer.h"
 #include "algorithms_geom.h"
+#include "triangulation_types.h"
 #include "polygon_triangulator.h"
 
 void app_viewer::draw(drawer_type & drawer) const {
@@ -27,7 +28,7 @@ void app_viewer::draw(drawer_type & drawer) const {
 		drawer::drawPolygon(drawer, h);
 
 	drawer.set_color(Qt::yellow);
-	for (segment_type sg : tri_segms) {
+	for (segment_type sg : triangulation_segments) {
 		drawer.draw_line(sg);
 	}
 
@@ -36,8 +37,8 @@ void app_viewer::draw(drawer_type & drawer) const {
 	}
 
 	drawer.set_color(Qt::darkYellow);
-	for (auto p : split_segments) {
-		drawer.draw_line(segment_type(polygon[p.first], polygon[p.second]));
+	for (auto seg : split_segments) {
+		drawer.draw_line(seg);
 	}
 
 //    drawer::drawLegend(drawer, get_legend_pnt());
@@ -236,8 +237,8 @@ bool app_viewer::on_triangulate() {
 	if (!is_polygon_loaded_successfully)
 		return false;
 	PolygonTriangulator pt(polygon, holes);
-//	point_types = geom::algorithms::get_points_types(polygon, holes);
-//	            split_segments = geom::algorithms::get_tri_split(polygon);
+	point_types = pt.get_points_types();
+	split_segments = pt.get_split_segments();
 	
 	
 //	geom::algorithms::triangulate(, tri_segms);
@@ -254,7 +255,7 @@ void app_viewer::restore_init_state() {
 	cur_drawing_pts.clear();
 	polygon.clear();
 	holes.clear();
-	tri_segms.clear();
+	triangulation_segments.clear();
 }
 
 bool app_viewer::on_hole_drawing_start() {

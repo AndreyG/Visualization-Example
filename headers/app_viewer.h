@@ -3,7 +3,7 @@
 #include "visualization/viewer_adapter.h"
 #include "visualization/draw_util.h"
 #include "io/point.h"
-#include "polygon_triangulator.h"
+#include "triangulation_types.h"
 
 #include "algorithms_geom.h"
 #include <iostream>
