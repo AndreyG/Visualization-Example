@@ -1,5 +1,5 @@
 #include "polygon_triangulator.h"
-#include "status.h"
+#include "triangulation_status.h"
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
@@ -97,9 +97,23 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 void PolygonTriangulator::fill_splits() {
 
 	vector<PolygonVertex*> events;
+	Status status;
 
 	sort(events.begin(), events.end(),
 			[](PolygonVertex* v, PolygonVertex* u) {return *v < *u;});
+
+	for (auto v : events) {
+		auto type = v->type;
+		auto helper = status.get_helper(v);
+		if (type == TRIP_SPLIT) {
+			splits.push_back(PolygonHoleSegment(*helper, *v));
+		}
+		if (helper != NULL && helper->type == TRIP_MERGE) {
+			splits.push_back(PolygonHoleSegment(*helper, *v));
+		}
+		status.remove(v);
+		status.add(v);
+	}
 
 }
 

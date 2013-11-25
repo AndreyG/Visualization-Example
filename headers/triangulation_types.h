@@ -79,10 +79,7 @@ public:
 	bool is_lower_regular() const {
 		if (type != TRIP_REGULAR)		
 			return false;
-		if(!polygon->isHole)
-			return next().point.x > point.x;
-		else
-			return prev().point.x > point.x;
+		return prev().point.x < next().point.x;
 	}
 	
 	TriPolygon& get_polygon(){
@@ -104,7 +101,7 @@ struct PolygonHoleSegment {
 	}
 	const PolygonVertex a;
 	const PolygonVertex b;
-	geom::structures::segment_type get_segment() {
+	geom::structures::segment_type get_segment() const {
 		return geom::structures::segment_type(a.point, b.point);
 	}
 

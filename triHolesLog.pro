@@ -31,12 +31,15 @@ HEADERS += headers/stdafx.h \
            headers/app_viewer.h \
            headers/polygon_triangulator.h \
            headers/triangulation_types.h \
+           headers/triangulation_status.h \
            headers/drawer.h \
+           headers/segment_map.h \
 
 SOURCES += src/main.cpp \
            src/algorithms_geom.cpp \ 
            src/app_viewer.cpp \
            src/polygon_triangulator.cpp \
            src/triangulation_types.cpp \
+           src/triangulation_status.cpp \
 
 LIBS += -Lvisualization -lvisualization
