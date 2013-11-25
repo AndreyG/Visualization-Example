@@ -57,25 +57,25 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 	turn = -turn;
 
 	// SPLIT
-	if (pme.x < pprev.x && pme.x <= pnext.x && turn == 1) {
+	if (pme.x <= pprev.x && pme.x < pnext.x && turn == 1) {
 		vertex.type = TRIP_SPLIT;
 		return;
 	}
 
 	// MERGE
-	if (pprev.x < pme.x && pnext.x <= pme.x && turn == 1) {
+	if (pprev.x <= pme.x && pnext.x < pme.x && turn == 1) {
 		vertex.type = TRIP_MERGE;
 		return;
 	}
 
 	// START
-	if (pme.x < pprev.x && pme.x <= pnext.x && turn == -1) {
+	if (pme.x <= pprev.x && pme.x < pnext.x && turn == -1) {
 		vertex.type = TRIP_START;
 		return;
 	}
 
 	// END
-	if (pprev.x < pme.x && pnext.x <= pme.x && turn == -1) {
+	if (pprev.x <= pme.x && pnext.x < pme.x && turn == -1) {
 		vertex.type = TRIP_END;
 		return;
 	}
