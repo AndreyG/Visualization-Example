@@ -2,7 +2,7 @@
 #include "status.h"
 #include <algorithm>
 #include <vector>
-
+#include <stdexcept>
 
 using namespace std;
 
@@ -53,84 +53,54 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 	auto pprev = vertex.prev().point;
 	auto pnext = vertex.next().point;
 	auto pme = vertex.point;
+	int turn = left_turn(pprev, pme, pnext);
+	turn = -turn;
 
-	if (pprev.x < pme.x && pme.x < pnext.x) {
-		vertex.type = TRIP_REGULAR;
-		return;
-	}
-
-	if (pme.x <= pprev.x && pme.x < pnext.x) {
-		auto turn = left_turn(pprev, pme, pnext);
-		if (turn > 0) {
-			vertex.type = TRIP_START;
-			return;
-		}
-	}
-
-	if (pme.x < pprev.x && pme.x < pnext.x) {
+	// SPLIT
+	if (pme.x < pprev.x && pme.x <= pnext.x && turn == 1) {
 		vertex.type = TRIP_SPLIT;
 		return;
 	}
 
-	if (pme.x > pprev.x && pme.x >= pnext.x) {
-		auto turn = left_turn(pprev, pme, pnext);
-		if (turn > 0) {
-			vertex.type = TRIP_END;
-			return;
-		} else {
-			vertex.type = TRIP_MERGE;
-			return;
-		}
+	// MERGE
+	if (pprev.x < pme.x && pnext.x <= pme.x && turn == 1) {
+		vertex.type = TRIP_MERGE;
+		return;
 	}
 
-	vertex.type = TRIP_REGULAR;
+	// START
+	if (pme.x < pprev.x && pme.x <= pnext.x && turn == -1) {
+		vertex.type = TRIP_START;
+		return;
+	}
+
+	// END
+	if (pprev.x < pme.x && pnext.x <= pme.x && turn == -1) {
+		vertex.type = TRIP_END;
+		return;
+	}
+
+	// REGULAR (upper and lower)
+	if (pprev.x <= pme.x && pme.x <= pnext.x) {
+		vertex.type = TRIP_REGULAR;
+		return;
+	}
+
+	if (pnext.x <= pme.x && pme.x <= pprev.x) {
+		vertex.type = TRIP_REGULAR;
+		return;
+	}
+
+	throw logic_error("Unknown vertex type case");
 
 }
 
 void PolygonTriangulator::fill_splits() {
 
-	vector<PolygonVertex*> orderByXY(all_vertexes);
-	Status status;
-	
-	sort(orderByXY.begin(), orderByXY.end(), [](PolygonVertex* i, PolygonVertex* j) {
-		return i->point < j->point;
-	});
+	vector<PolygonVertex*> events;
 
-	for (auto vp : orderByXY) {
-
-		auto type = vp->type;
-		if (type == TRIP_START) {
-			status.add(*vp);
-			continue;
-		}
-
-		bool foundGoodHelper = false;
-		PolygonVertex* helper = status.helper(*vp);
-		if (helper != NULL && *helper != vp->prev()) {
-			foundGoodHelper = true;
-		}
-		if (!foundGoodHelper) {
-			PolygonVertex* lowSevp = status.find_lower_segment(*vp);
-			if (lowSevp != NULL) {
-				helper = status.helper(*lowSevp);
-				foundGoodHelper = true;
-			}
-		}
-		if (foundGoodHelper) {
-			TRIP_TYPE helperType = helper->type;
-//			cout << "(" << i << ", " << helper << ") " << endl;
-			if (helperType == TRIP_MERGE) {
-				splits.push_back(PolygonHoleSegment(*vp, *helper));
-			}
-			if (type == TRIP_SPLIT) {
-				splits.push_back(PolygonHoleSegment(*vp, *helper));
-			}
-		}
-		status.remove(*vp);
-		status.update(*vp);
-		status.add(*vp);
-
-	}
+	sort(events.begin(), events.end(),
+			[](PolygonVertex* v, PolygonVertex* u) {return *v < *u;});
 
 }
 

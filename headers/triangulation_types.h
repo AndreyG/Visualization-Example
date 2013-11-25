@@ -77,9 +77,12 @@ public:
 	}
 
 	bool is_lower_regular() const {
-		if (type != TRIP_REGULAR)
+		if (type != TRIP_REGULAR)		
 			return false;
-		return next().point.x > point.x;
+		if(!polygon->isHole)
+			return next().point.x > point.x;
+		else
+			return prev().point.x > point.x;
 	}
 	
 	TriPolygon& get_polygon(){
@@ -89,7 +92,7 @@ public:
 	inline bool operator ==(PolygonVertex const & b) const {
 		return (polygon == b.polygon) && (index == b.index);
 	}
-
+	
 };
 
 struct PolygonHoleSegment {
