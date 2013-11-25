@@ -14,7 +14,6 @@ using namespace geom::structures;
 using namespace geom::algorithms;
 
 class Status {
-	segments;
 
 public:
 
@@ -38,17 +37,17 @@ public:
 			return;
 
 		auto left = find_lower_segment(v);
-		if (left == (size_t) (-1))
+		if (left == NULL)
 			return;
-		cout << "helper[" << left << "] " << helper_[left] << "->" << v.index << "\n";
-		helper_[left] = v;
+//		cout << "helper[" << left << "] " << helper_[left] << "->" << v.index << "\n";
+		helper_[*left] = v;
 	}
 
-	size_t find_lower_segment(const PolygonVertex& v) {
+	PolygonVertex* find_lower_segment(const PolygonVertex& v) {
 		cout << "search: " << v.index << ": ";
 		auto lastGood = segments.end();
 		for (auto it = segments.begin(); it != segments.end(); it++) {
-			cout << v.prev() << " " << *it << " ";
+//			cout << v.prev() << " " << *it << " ";
 			point_type pa = it->prev().point;
 			point_type pb = it->point;
 			int turn = left_turn(segment_type(pa, pb), v.point);
@@ -58,12 +57,12 @@ public:
 			else
 				break;
 		}
-		cout << " -- res: " << *lastGood << endl;
+//		cout << " -- res: " << *lastGood << endl;
 
 		if (lastGood == segments.end()) {
 			cout << "NOT FOUND LOWER SEGMENT FOR " << v.index << "!";
 			cout << endl;
-			return (size_t) -1;
+			return NULL;
 		}
 
 		return *lastGood;
@@ -84,13 +83,13 @@ public:
 			cout << endl;
 			return;
 		}
-		segments.erase(it);
+		segments.erase(it);	
 	}
 
 	PolygonVertex* helper(const PolygonVertex& v) {
 		auto it = helper_.find(v);
 		if (it != helper_.end()) {
-			return &*it;
+			return &it->second;
 		}
 		return NULL;
 	}
@@ -98,7 +97,7 @@ public:
 private:
 
 	map<PolygonVertex, PolygonVertex> helper_;
-	vector<PolygonVertex> segments;
+	vector<PolygonVertex*> segments;
 
 	void insert(const PolygonVertex& v) {
 		cout << "insert " << v.index;

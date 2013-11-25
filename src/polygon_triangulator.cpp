@@ -1,6 +1,8 @@
 #include "polygon_triangulator.h"
+#include "status.h"
 #include <algorithm>
 #include <vector>
+
 
 using namespace std;
 
@@ -38,14 +40,12 @@ void PolygonTriangulator::collect_all_vertexes() {
 	for (size_t i = 0; i < this->polygon.size(); i++) {
 		all_vertexes.push_back(&this->polygon[i]);
 	}
-//	cout << all_vertexes.size() << ":::-->";
 	for (size_t k = 0; k < this->holes.size(); k++) {
 		for (size_t i = 0; i < this->holes[k]->size(); i++) {
 			auto h = this->holes[k];
 			all_vertexes.push_back(&((*h)[i]));
 		}
 	}
-//	cout << all_vertexes.size() << endl;
 }
 
 void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
@@ -88,6 +88,50 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 }
 
 void PolygonTriangulator::fill_splits() {
+
+	vector<PolygonVertex*> orderByXY(all_vertexes);
+	Status status;
+	
+	sort(orderByXY.begin(), orderByXY.end(), [](PolygonVertex* i, PolygonVertex* j) {
+		return i->point < j->point;
+	});
+
+	for (auto vp : orderByXY) {
+
+		auto type = vp->type;
+		if (type == TRIP_START) {
+			status.add(*vp);
+			continue;
+		}
+
+		bool foundGoodHelper = false;
+		PolygonVertex* helper = status.helper(*vp);
+		if (helper != NULL && *helper != vp->prev()) {
+			foundGoodHelper = true;
+		}
+		if (!foundGoodHelper) {
+			PolygonVertex* lowSevp = status.find_lower_segment(*vp);
+			if (lowSevp != NULL) {
+				helper = status.helper(*lowSevp);
+				foundGoodHelper = true;
+			}
+		}
+		if (foundGoodHelper) {
+			TRIP_TYPE helperType = helper->type;
+//			cout << "(" << i << ", " << helper << ") " << endl;
+			if (helperType == TRIP_MERGE) {
+				splits.push_back(PolygonHoleSegment(*vp, *helper));
+			}
+			if (type == TRIP_SPLIT) {
+				splits.push_back(PolygonHoleSegment(*vp, *helper));
+			}
+		}
+		status.remove(*vp);
+		status.update(*vp);
+		status.add(*vp);
+
+	}
+
 }
 
 void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
@@ -97,9 +141,8 @@ void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
 void PolygonTriangulator::triangulate() {
 }
 
-
-PolygonTriangulator::~PolygonTriangulator(){
-	for(auto h: holes){
+PolygonTriangulator::~PolygonTriangulator() {
+	for (auto h : holes) {
 		delete h;
 	}
 }
