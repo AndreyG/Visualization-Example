@@ -54,9 +54,9 @@ void Status::update_helper(const PolygonVertex* v) {
 	segments.push_back(seg);
 	auto it = helper.upper_bound(segments.size() - 1);
 	segments.pop_back();
-	if (it == helper.end())
+	if(it==helper.end())
 		return;
-	it->second = v;
+
 }
 
 const PolygonVertex* Status::get_right_end(const PolygonVertex* v) {
