@@ -250,10 +250,11 @@ void app_viewer::restore_init_state() {
 	is_polygon_draw_state = false;
 	is_polygon_loaded_successfully = false;
 	is_hole_draw_state = false;
-	point_types.clear();
 	cur_drawing_pts.clear();
 	polygon.clear();
 	holes.clear();
+	point_types.clear();
+	split_segments.clear();
 	triangulation_segments.clear();
 }
 

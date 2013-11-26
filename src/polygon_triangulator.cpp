@@ -96,7 +96,7 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 
 void PolygonTriangulator::fill_splits() {
 
-	vector<PolygonVertex*> events;
+	vector<PolygonVertex*> events(all_vertexes);
 	Status status;
 
 	sort(events.begin(), events.end(),

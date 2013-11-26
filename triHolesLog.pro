@@ -33,7 +33,6 @@ HEADERS += headers/stdafx.h \
            headers/triangulation_types.h \
            headers/triangulation_status.h \
            headers/drawer.h \
-           headers/segment_map.h \
 
 SOURCES += src/main.cpp \
            src/algorithms_geom.cpp \ 
