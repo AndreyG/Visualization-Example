@@ -32,10 +32,15 @@ void Status::remove(const PolygonVertex* v) {
 }
 
 const PolygonVertex* Status::get_helper(const PolygonVertex* v) {
+	// if v is a right end (it is not upper_bound)
 	auto it = rightEndToSegment.find(v);
 	if (it != rightEndToSegment.end()) {
 		return helper[it->second]; // sometimes it is NULL
 	}
+	return get_lower_helper(v);
+}
+
+const PolygonVertex* Status::get_lower_helper(const PolygonVertex* v) {
 	PolygonHoleSegment seg(*v, *v);
 	segments.push_back(seg);
 	auto ith = helper.upper_bound(segments.size() - 1);
@@ -46,17 +51,22 @@ const PolygonVertex* Status::get_helper(const PolygonVertex* v) {
 	if (ith->second != NULL)
 		return ith->second;
 	return &segments[ith->first].a;
-
 }
 
 void Status::update_helper(const PolygonVertex* v) {
+	if (v->is_lower_regular())
+		return;
+	if (v->type == TRIP_START)
+		return;
+	if (v->type == TRIP_END)
+		return;
 	PolygonHoleSegment seg(*v, *v);
 	segments.push_back(seg);
 	auto it = helper.upper_bound(segments.size() - 1);
 	segments.pop_back();
-	if(it==helper.end())
+	if (it == helper.end())
 		return;
-
+	it->second = v;
 }
 
 const PolygonVertex* Status::get_right_end(const PolygonVertex* v) {
@@ -89,13 +99,20 @@ bool Status::HelperComparator::operator()(const size_t& a, const size_t b) {
 
 	int turnsa0 = left_turn(sa, sb[0]);
 	int turnsa1 = left_turn(sa, sb[1]);
-	if (turnsa0 == turnsa1 || turnsa0 == 0) {
+	if ((turnsa0 == turnsa1 || turnsa0 == 0) && sa[0] != sa[1]) {
 		return turnsa1 == -1; // because we need not less but great
+	}
+
+	// sometimes we find upper_bound 
+	// (it means strongly under) 
+	// but sa is a point
+	if (sb[1] == sa[0] && sb[1] == sa[1]) {
+		return false;
 	}
 
 	int turnsb0 = left_turn(sb, sa[0]);
 	int turnsb1 = left_turn(sb, sa[1]);
-	if (turnsb0 != turnsb1 || turnsb0 == 0) {
+	if (turnsb0 == -turnsb1 && turnsb0 != 0) {
 		throw std::logic_error("Segments intersected!");
 	} else {
 		return turnsb1 == 1;

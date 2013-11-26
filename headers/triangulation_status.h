@@ -20,6 +20,10 @@ public:
 	// Find point u such that u and v upper than some segment 
 	// but not lie together on it, otherwise return NULL.
 	const PolygonVertex* get_helper(const PolygonVertex* v);
+	
+	// It's a TRIP_MERGE vertex case. This vertex can has two
+	// helpers (upper and lower)
+	const PolygonVertex* get_lower_helper(const PolygonVertex* v);
 
 	Status() :
 			helper(segments) {

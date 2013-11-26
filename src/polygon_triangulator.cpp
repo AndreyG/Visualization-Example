@@ -54,37 +54,31 @@ void PolygonTriangulator::set_trip_type(PolygonVertex& vertex) {
 	auto pnext = vertex.next().point;
 	auto pme = vertex.point;
 	int turn = left_turn(pprev, pme, pnext);
-
 	// SPLIT
-	if (pme.x <= pprev.x && pme.x < pnext.x && turn == -1) {
+	if (pme.x < pprev.x && pme.x <= pnext.x && turn == -1) {
 		vertex.type = TRIP_SPLIT;
 		return;
 	}
-
 	// MERGE
-	if (pprev.x <= pme.x && pnext.x < pme.x && turn == -1) {
+	if (pprev.x < pme.x && pnext.x <= pme.x && turn == -1) {
 		vertex.type = TRIP_MERGE;
 		return;
 	}
-
 	// START
 	if (pme.x <= pprev.x && pme.x < pnext.x && turn == 1) {
 		vertex.type = TRIP_START;
 		return;
 	}
-
 	// END
 	if (pprev.x <= pme.x && pnext.x < pme.x && turn == 1) {
 		vertex.type = TRIP_END;
 		return;
 	}
-
 	// REGULAR (upper and lower)
 	if (pprev.x <= pme.x && pme.x <= pnext.x) {
 		vertex.type = TRIP_REGULAR;
 		return;
 	}
-
 	if (pnext.x <= pme.x && pme.x <= pprev.x) {
 		vertex.type = TRIP_REGULAR;
 		return;
@@ -108,8 +102,15 @@ void PolygonTriangulator::fill_splits() {
 		if (type == TRIP_SPLIT) {
 			splits.push_back(PolygonHoleSegment(*helper, *v));
 		}
-		if (helper != NULL && helper->type == TRIP_MERGE) {
+		if (helper != NULL && helper->type == TRIP_MERGE
+				&& type != TRIP_START) {
 			splits.push_back(PolygonHoleSegment(*helper, *v));
+		}
+		if (type == TRIP_MERGE) {
+			auto helperLower = status.get_lower_helper(v);
+			if (helperLower->type == TRIP_MERGE) {
+				splits.push_back(PolygonHoleSegment(*helperLower, *v));
+			}
 		}
 		status.remove(v);
 		status.add(v);
