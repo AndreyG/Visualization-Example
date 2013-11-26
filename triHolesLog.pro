@@ -33,6 +33,7 @@ HEADERS += headers/stdafx.h \
            headers/triangulation_types.h \
            headers/triangulation_status.h \
            headers/drawer.h \
+           headers/dcel.h \
 
 SOURCES += src/main.cpp \
            src/algorithms_geom.cpp \ 
@@ -40,5 +41,6 @@ SOURCES += src/main.cpp \
            src/polygon_triangulator.cpp \
            src/triangulation_types.cpp \
            src/triangulation_status.cpp \
+           src/dcel.cpp \
 
 LIBS += -Lvisualization -lvisualization
