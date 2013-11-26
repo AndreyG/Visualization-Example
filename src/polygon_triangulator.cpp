@@ -93,8 +93,9 @@ void PolygonTriangulator::fill_splits() {
 	vector<PolygonVertex*> events(all_vertexes);
 	Status status;
 
-	sort(events.begin(), events.end(),
-			[](PolygonVertex* v, PolygonVertex* u) {return *v < *u;});
+	sort(events.begin(), events.end(), [](PolygonVertex* v, PolygonVertex* u) {
+		return *v < *u;
+	});
 
 	for (auto v : events) {
 		auto type = v->type;

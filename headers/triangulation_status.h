@@ -44,9 +44,12 @@ private:
 	// Maps index from segments to helper,
 	// all keys in map are used to determine
 	// whether segment active or not
-	map<size_t, const PolygonVertex*, HelperComparator> helper;
+	typedef map<size_t, const PolygonVertex*, HelperComparator> helper_type;
+	helper_type helper;
 
 	void update_helper(const PolygonVertex* v);
 	const PolygonVertex* get_right_end(const PolygonVertex* v);
+	
+	helper_type::iterator find_bound(const PolygonVertex* v);
 
 };

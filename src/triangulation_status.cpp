@@ -41,11 +41,7 @@ const PolygonVertex* Status::get_helper(const PolygonVertex* v) {
 }
 
 const PolygonVertex* Status::get_lower_helper(const PolygonVertex* v) {
-	PolygonHoleSegment seg(*v, *v);
-	segments.push_back(seg);
-	auto ith = helper.upper_bound(segments.size() - 1);
-	segments.pop_back();
-
+	auto ith = find_bound(v);
 	if (ith == helper.end())
 		return NULL;
 	if (ith->second != NULL)
@@ -60,10 +56,7 @@ void Status::update_helper(const PolygonVertex* v) {
 		return;
 	if (v->type == TRIP_END)
 		return;
-	PolygonHoleSegment seg(*v, *v);
-	segments.push_back(seg);
-	auto it = helper.upper_bound(segments.size() - 1);
-	segments.pop_back();
+	auto it = find_bound(v);
 	if (it == helper.end())
 		return;
 	it->second = v;
@@ -120,3 +113,10 @@ bool Status::HelperComparator::operator()(const size_t& a, const size_t b) {
 
 }
 
+Status::helper_type::iterator Status::find_bound(const PolygonVertex* v) {
+	PolygonHoleSegment seg(*v, *v);
+	segments.push_back(seg);
+	auto it = helper.upper_bound(segments.size() - 1);
+	segments.pop_back();
+	return it;
+}
