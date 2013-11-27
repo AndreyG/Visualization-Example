@@ -1,5 +1,6 @@
 #include "polygon_triangulator.h"
 #include "triangulation_status.h"
+#include "dcel.h"
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
@@ -93,9 +94,16 @@ void PolygonTriangulator::fill_splits() {
 	vector<PolygonVertex*> events(all_vertexes);
 	Status status;
 
+	DCEL dcel;
+
 	sort(events.begin(), events.end(), [](PolygonVertex* v, PolygonVertex* u) {
 		return *v < *u;
 	});
+
+	for (auto v : events)
+		dcel.add_vertex(v);
+	for (auto v : events)
+		dcel.add_segment(v, &v->next());
 
 	for (auto v : events) {
 		auto type = v->type;
