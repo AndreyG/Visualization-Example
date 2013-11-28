@@ -48,9 +48,9 @@ public:
 	};
 
 	void add_vertex(const PolygonVertex* v);
-	void add_segment(const PolygonVertex* u, const PolygonVertex* v);
+	Edge* add_segment(const PolygonVertex* u, const PolygonVertex* v);
 	vector<DCEL::Edge*> get_all_edges (const PolygonVertex* v) const;
-	vector<polygon_type> get_all_facets(const vector<PolygonVertex*>& outerPolygon) const;
+	vector<polygon_type> get_all_facets(const vector<DCEL::Edge*>&) const;
 	~DCEL();
 
 private:

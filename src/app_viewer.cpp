@@ -37,12 +37,11 @@ void app_viewer::draw(drawer_type & drawer) const {
 		drawer::drawTripVertex(drawer, p.first, p.second);
 	}
 
-	drawer.set_color(Qt::darkYellow);
+	drawer.set_color(Qt::green);
 	for (auto seg : split_segments) {
 		drawer.draw_line(seg);
 	}
 	
-//    drawer::drawLegend(drawer, get_legend_pnt());
 
 }
 
@@ -80,13 +79,13 @@ void app_viewer::print(printer_type & printer) const {
 		global_stream2 << " Or press H to start drawing a hole.";
 	}
 
-	stream_type& global_stream3 = printer.global_stream(get_legend_pnt());
-	global_stream3 << "LEGEND:";
-	global_stream3 << "         regular";
-	global_stream3 << "         start";
-	global_stream3 << "         split";
-	global_stream3 << "         end";
-	global_stream3 << "         merge";
+//	stream_type& global_stream3 = printer.global_stream(get_legend_pnt());
+//	global_stream3 << "LEGEND:";
+//	global_stream3 << "         regular";
+//	global_stream3 << "         start";
+//	global_stream3 << "         split";
+//	global_stream3 << "         end";
+//	global_stream3 << "         merge";
 
 }
 

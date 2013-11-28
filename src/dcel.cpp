@@ -32,7 +32,7 @@ void DCEL::add_vertex(const PolygonVertex* v) {
 	vertexEdge[v] = NULL;
 }
 
-void DCEL::add_segment(const PolygonVertex* u, const PolygonVertex* v) {
+DCEL::Edge* DCEL::add_segment(const PolygonVertex* u, const PolygonVertex* v) {
 	Edge* ev = new Edge();
 	Edge* eu = new Edge();
 
@@ -44,14 +44,19 @@ void DCEL::add_segment(const PolygonVertex* u, const PolygonVertex* v) {
 	edges.push_back(eu);
 
 	cout << "create edge " << ev;
-	cout << " (" << ev->from()->point.x << ", " << ev->from()->point.y << ") -> ";
-	cout << "(" << ev->to()->point.x << ", " << ev->to()->point.y << ") " << endl;
+	cout << " (" << ev->from()->point.x << ", " << ev->from()->point.y
+			<< ") -> ";
+	cout << "(" << ev->to()->point.x << ", " << ev->to()->point.y << ") "
+			<< endl;
 	cout << "create edge " << eu;
-	cout << " (" << eu->from()->point.x << ", " << eu->from()->point.y << ") -> ";
-	cout << "(" << eu->to()->point.x << ", " << eu->to()->point.y << ") " << endl;
+	cout << " (" << eu->from()->point.x << ", " << eu->from()->point.y
+			<< ") -> ";
+	cout << "(" << eu->to()->point.x << ", " << eu->to()->point.y << ") "
+			<< endl;
 
 	insert_new_edge(ev);
 	insert_new_edge(eu);
+	return ev;
 }
 
 void DCEL::insert_new_edge(Edge* edge) {
@@ -82,7 +87,7 @@ void DCEL::insert_new_edge(Edge* edge) {
 		for (auto e : edges) {
 			auto angleBefore = angle2pi(e);
 			auto angleAfter = angle2pi(e->right_next());
-			if(abs(angleBefore - 6.02356) < 0.001){
+			if (abs(angleBefore - 6.02356) < 0.001) {
 				int k = 10;
 			}
 			if (angleBefore > eangle && angleAfter < eangle) {
@@ -91,11 +96,11 @@ void DCEL::insert_new_edge(Edge* edge) {
 			}
 		}
 	}
-	
-	if(prevEdge == NULL){
-		
+
+	if (prevEdge == NULL) {
+
 		cout << "-----------" << endl;
-		for(auto e: edges){
+		for (auto e : edges) {
 			cout << angle2pi(e) << " ";
 		}
 		cout << " vs " << eangle << endl;
@@ -134,20 +139,17 @@ polygon_type DCEL::walk(Edge* e) const {
 }
 
 vector<polygon_type> DCEL::get_all_facets(
-		const vector<PolygonVertex*>& outerPolygon) const {
+		const vector<DCEL::Edge*>& knownBorderEdges) const {
 	vector<polygon_type> res;
 
 	for (auto e : edges) {
 		e->visited_ = false;
 	}
 
-	for (auto pv : outerPolygon) {
-		auto edges = get_all_edges(pv);
-		for (auto e : edges) {
-			if (e->visited_)
-				continue;
-			res.push_back(walk(e));
-		}
+	for (auto e : knownBorderEdges) {
+		if (e->visited_)
+			continue;
+		res.push_back(walk(e));
 	}
 
 	return res;

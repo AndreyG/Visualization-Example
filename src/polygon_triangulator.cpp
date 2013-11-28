@@ -103,10 +103,13 @@ void PolygonTriangulator::fill_splits() {
 		return *v < *u;
 	});
 
+	vector<DCEL::Edge*> edgesToVisit;
 	for (auto v : events)
 		dcel.add_vertex(v);
-	for (auto v : events)
-		dcel.add_segment(v, &v->next());
+	for (auto v : events){
+		auto ep = dcel.add_segment(v, &v->next());
+		edgesToVisit.push_back(ep);
+	}
 
 	for (auto v : events) {
 		auto type = v->type;
@@ -132,28 +135,8 @@ void PolygonTriangulator::fill_splits() {
 	for (auto s : splits)
 		dcel.add_segment(&s.a, &s.b);
 
-	vector<PolygonVertex*> pvs;
+	splitted_polygons = dcel.get_all_facets(edgesToVisit);
 
-	for (size_t i = 0; i < this->polygon.size(); i++) {
-		pvs.push_back(&this->polygon[i]);
-	}
-	splitted_polygons = dcel.get_all_facets(pvs);
-
-	// remove outer polygon (original polygon added reversed)
-	for (auto it = splitted_polygons.begin(); it != splitted_polygons.end();
-			++it) {
-		const polygon_type& p = *it;
-		auto itp0 = find(p.begin(), p.end(), polygon[1].point);
-		if (itp0 == p.end())
-			continue;
-		itp0++;
-		if (itp0 == p.end())
-			itp0 = p.begin();
-		if (*itp0 != polygon[0].point)
-			continue;
-		splitted_polygons.erase(it);
-		break;
-	}
 
 }
 
