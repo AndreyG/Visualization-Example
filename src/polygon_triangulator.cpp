@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>
+#include <stack>
 
 using namespace std;
 
@@ -25,11 +26,12 @@ vector<segment_type> PolygonTriangulator::get_split_segments() {
 }
 
 vector<segment_type> PolygonTriangulator::get_triangulation_segments() {
-	vector<segment_type> res;
-	for (auto t : triangulation_segments) {
-		res.push_back(t.get_segment());
-	}
-	return res;
+//	vector<segment_type> res;
+//	for (auto t : triangulation_segments) {
+//		res.push_back(t.get_segment());
+//	}
+//	return res;
+	return triangulation_segments;
 }
 
 void PolygonTriangulator::fill_points_types() {
@@ -155,18 +157,82 @@ void PolygonTriangulator::fill_splits() {
 
 }
 
-void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
+void PolygonTriangulator::triangulate_monotonous(const polygon_type& pts_,
 		vector<segment_type>& res) {
+
+	vector<point_type> pts(pts_);
+	auto minIt = min_element(pts.begin(), pts.end());
+
+	rotate(pts.begin(), minIt, pts.end());
+
+	size_t maxI = max_element(pts.begin(), pts.end()) - pts.begin();
+
+	vector<size_t> orderByXY;
+	size_t upI = pts.size() - 1;
+	size_t lowI = 0;
+	while (upI >= maxI || lowI < maxI) {
+		if (upI < maxI || pts[lowI] < pts[upI]) {
+			orderByXY.push_back(lowI++);
+			continue;
+		}
+		orderByXY.push_back(upI--);
+	}
+
+	stack<size_t> st;
+	st.push(orderByXY[0]);
+	st.push(orderByXY[1]);
+
+	for (size_t i = 2; i < pts.size() - 1; i++) {
+		bool prevWasTop = st.top() >= maxI;
+		bool meTop = orderByXY[i] >= maxI;
+		auto curPoint = pts[orderByXY[i]];
+
+		if (prevWasTop != meTop) {
+			auto newTop = st.top();
+			while (st.size() > 1) {
+				res.push_back(segment_type(pts[st.top()], curPoint));
+				st.pop();
+			}
+			st.pop();
+			st.push(newTop);
+		} else {
+			int currentTurn = meTop ? 1 : -1;
+			while (st.size() > 1) {
+				auto bi = st.top();
+				st.pop();
+				auto ci = st.top();
+				bool isRightTurn = left_turn(curPoint, pts[bi], pts[ci])
+						== currentTurn;
+				if (isRightTurn) {
+					res.push_back(segment_type(curPoint, pts[ci]));
+				} else {
+					st.push(bi);
+					break;
+				}
+			}
+		}
+
+		st.push(orderByXY[i]);
+
+	}
+
+	st.pop();
+	while (st.size() > 1) {
+		res.push_back(segment_type(pts[st.top()], pts[maxI]));
+		st.pop();
+	}
 
 }
 
 void PolygonTriangulator::triangulate() {
 	for (auto pc : splitted_polygons) {
-		cout << "polygon: ";
-		for (auto p : pc) {
-			cout << "(" << p.x << ", " << p.y << ") ";
-		}
-		cout << endl;
+//		cout << "polygon: ";
+//		for (auto p : pc) {
+//			cout << "(" << p.x << ", " << p.y << ") ";
+//		}
+//		cout << endl;
+		triangulate_monotonous(pc, triangulation_segments);
+		
 	}
 
 }

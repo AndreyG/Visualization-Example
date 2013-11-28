@@ -41,7 +41,7 @@ void app_viewer::draw(drawer_type & drawer) const {
 	for (auto seg : split_segments) {
 		drawer.draw_line(seg);
 	}
-
+	
 //    drawer::drawLegend(drawer, get_legend_pnt());
 
 }
