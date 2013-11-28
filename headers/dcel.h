@@ -17,6 +17,12 @@ public:
 		Edge* twin_;
 		const PolygonVertex* to_;
 		bool visited_;
+		Edge(){
+			next_ = NULL;
+			twin_ = NULL;
+			to_ = NULL;
+			visited_ = false;
+		}
 	public:
 		inline Edge* next() const {
 			return this->next_;

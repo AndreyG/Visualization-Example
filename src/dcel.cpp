@@ -34,12 +34,21 @@ void DCEL::add_vertex(const PolygonVertex* v) {
 void DCEL::add_segment(const PolygonVertex* u, const PolygonVertex* v) {
 	Edge* ev = new Edge();
 	Edge* eu = new Edge();
+
 	ev->to_ = v;
 	eu->to_ = u;
 	ev->twin_ = eu;
 	eu->twin_ = ev;
 	edges.push_back(ev);
 	edges.push_back(eu);
+
+	cout << "create edge " << ev;
+	cout << " (" << ev->from()->point.x << ", " << ev->from()->point.y << ") -> ";
+	cout << "(" << ev->to()->point.x << ", " << ev->to()->point.y << ") " << endl;
+	cout << "create edge " << eu;
+	cout << " (" << eu->from()->point.x << ", " << eu->from()->point.y << ") -> ";
+	cout << "(" << eu->to()->point.x << ", " << eu->to()->point.y << ") " << endl;
+
 	insert_new_edge(ev);
 	insert_new_edge(eu);
 }
@@ -48,7 +57,7 @@ void DCEL::insert_new_edge(Edge* edge) {
 	const PolygonVertex* from = edge->from();
 	if (vertexEdge[from] == NULL) {
 		vertexEdge[from] = edge;
-		edge->twin()->next_ = edge;
+		edge->right_next(edge);
 		return;
 	}
 	auto edges = get_all_edges(from);
@@ -78,9 +87,8 @@ void DCEL::insert_new_edge(Edge* edge) {
 			}
 		}
 	}
-	
-	
-	edge->right_next(prevEdge->next());
+
+	edge->right_next(prevEdge->right_next());
 	prevEdge->right_next(edge);
 
 }
@@ -91,10 +99,10 @@ vector<DCEL::Edge*> DCEL::get_all_edges(const PolygonVertex* v) const {
 	if (firstEdge == NULL)
 		return res;
 	Edge* curEdge = firstEdge;
-	while(true) {
+	while (true) {
 		res.push_back(curEdge);
 		curEdge = curEdge->right_next();
-		if(curEdge == firstEdge)
+		if (curEdge == firstEdge)
 			break;
 	}
 	return res;
