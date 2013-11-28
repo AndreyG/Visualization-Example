@@ -112,8 +112,9 @@ void PolygonTriangulator::fill_splits() {
 		if (type == TRIP_SPLIT) {
 			splits.push_back(PolygonHoleSegment(*helper, *v));
 		}
-		if (helper != NULL && helper->type == TRIP_MERGE
-				&& type != TRIP_START) {
+		if (helper != NULL && helper->type == TRIP_MERGE && type != TRIP_START
+				&& type != TRIP_SPLIT // because it's repeat previous step
+						) {
 			splits.push_back(PolygonHoleSegment(*helper, *v));
 		}
 		if (type == TRIP_MERGE) {
@@ -136,16 +137,33 @@ void PolygonTriangulator::fill_splits() {
 	}
 	splitted_polygons = dcel.get_all_facets(pvs);
 
+	// remove outer polygon (original polygon added reversed)
+	for (auto it = splitted_polygons.begin(); it != splitted_polygons.end();
+			++it) {
+		const polygon_type& p = *it;
+		auto itp0 = find(p.begin(), p.end(), polygon[1].point);
+		if (itp0 == p.end())
+			continue;
+		itp0++;
+		if (itp0 == p.end())
+			itp0 = p.begin();
+		if (*itp0 != polygon[0].point)
+			continue;
+		splitted_polygons.erase(it);
+		break;
+	}
+
 }
 
 void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
 		vector<segment_type>& res) {
+
 }
 
 void PolygonTriangulator::triangulate() {
-	for(auto pc: splitted_polygons){
+	for (auto pc : splitted_polygons) {
 		cout << "polygon: ";
-		for(auto p: pc){
+		for (auto p : pc) {
 			cout << "(" << p.x << ", " << p.y << ") ";
 		}
 		cout << endl;

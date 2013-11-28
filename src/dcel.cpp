@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <math.h>
+#include <iostream>
 
 using namespace std;
 using namespace geom::algorithms;
@@ -81,11 +82,25 @@ void DCEL::insert_new_edge(Edge* edge) {
 		for (auto e : edges) {
 			auto angleBefore = angle2pi(e);
 			auto angleAfter = angle2pi(e->right_next());
+			if(abs(angleBefore - 6.02356) < 0.001){
+				int k = 10;
+			}
 			if (angleBefore > eangle && angleAfter < eangle) {
 				prevEdge = e;
 				break;
 			}
 		}
+	}
+	
+	if(prevEdge == NULL){
+		
+		cout << "-----------" << endl;
+		for(auto e: edges){
+			cout << angle2pi(e) << " ";
+		}
+		cout << " vs " << eangle << endl;
+		cout << "***********" << endl;
+		int jjj = 12;
 	}
 
 	edge->right_next(prevEdge->right_next());
