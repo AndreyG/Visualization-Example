@@ -140,8 +140,8 @@ bool is_polygons_intersected(const polygon_type& polygonA,
 			point_type fromb = polygonB[j];
 			point_type tob = polygonB[(j + 1) % polygonB.size()];
 			segment_type sb(fromb, tob);
-			if (segments_intersected(sa, sb)){
-				cout << sa[0] << " " << sa[1] << "-"  << sb[0] << " " << sb[1];
+			if (segments_intersected(sa, sb)) {
+				cout << sa[0] << " " << sa[1] << "-" << sb[0] << " " << sb[1];
 				return true;
 			}
 		}
@@ -151,13 +151,18 @@ bool is_polygons_intersected(const polygon_type& polygonA,
 
 bool is_polygons_intersected(const vector<polygon_type>& polygons,
 		const vector<point_type>& polygon) {
-	for(auto p: polygons){
+	for (auto p : polygons) {
 		if (is_polygons_intersected(p, polygon))
 			return true;
 	}
 	return false;
 }
 
+point_type operator-(const point_type& a, const point_type& b) {
+	int x = a.x - b.x;
+	int y = a.y - b.y;
+	return point_type(x, y);
+}
 }
 }
 

@@ -18,6 +18,7 @@ class PolygonTriangulator {
 	vector<PolygonHoleSegment> splits;
 	vector<PolygonHoleSegment> triangulation_segments;
 	vector<PolygonVertex*> all_vertexes;
+	vector<polygon_type> splitted_polygons;
 
 public:
 

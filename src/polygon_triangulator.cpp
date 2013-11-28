@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -125,6 +126,16 @@ void PolygonTriangulator::fill_splits() {
 		status.add(v);
 	}
 
+	for (auto s : splits)
+		dcel.add_segment(&s.a, &s.b);
+
+	vector<PolygonVertex*> pvs;
+
+	for (size_t i = 0; i < this->polygon.size(); i++) {
+		pvs.push_back(&this->polygon[i]);
+	}
+	splitted_polygons = dcel.get_all_facets(pvs);
+
 }
 
 void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
@@ -132,6 +143,14 @@ void PolygonTriangulator::triangulate_monotonous(const polygon_type& polygon,
 }
 
 void PolygonTriangulator::triangulate() {
+	for(auto pc: splitted_polygons){
+		cout << "polygon: ";
+		for(auto p: pc){
+			cout << "(" << p.x << ", " << p.y << ") ";
+		}
+		cout << endl;
+	}
+
 }
 
 PolygonTriangulator::~PolygonTriangulator() {
