@@ -37,7 +37,7 @@ void DCEL::add_segment(const PolygonVertex* u, const PolygonVertex* v) {
 	ev->to_ = v;
 	eu->to_ = u;
 	ev->twin_ = eu;
-	eu->twin_ = eu;
+	eu->twin_ = ev;
 	edges.push_back(ev);
 	edges.push_back(eu);
 	insert_new_edge(ev);
@@ -78,9 +78,10 @@ void DCEL::insert_new_edge(Edge* edge) {
 			}
 		}
 	}
-
+	
+	
+	edge->right_next(prevEdge->next());
 	prevEdge->right_next(edge);
-	edge->right_next(prevEdge->right_next());
 
 }
 
@@ -90,10 +91,12 @@ vector<DCEL::Edge*> DCEL::get_all_edges(const PolygonVertex* v) const {
 	if (firstEdge == NULL)
 		return res;
 	Edge* curEdge = firstEdge;
-	do {
+	while(true) {
 		res.push_back(curEdge);
 		curEdge = curEdge->right_next();
-	} while (curEdge != firstEdge);
+		if(curEdge == firstEdge)
+			break;
+	}
 	return res;
 }
 
