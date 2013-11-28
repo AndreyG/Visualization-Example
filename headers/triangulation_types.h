@@ -99,8 +99,8 @@ struct PolygonHoleSegment {
 	PolygonHoleSegment(const PolygonHoleSegment& other) :
 			a(other.a), b(other.b) {
 	}
-	const PolygonVertex a;
-	const PolygonVertex b;
+	const PolygonVertex& a;
+	const PolygonVertex& b;
 	geom::structures::segment_type get_segment() const {
 		return geom::structures::segment_type(a.point, b.point);
 	}
